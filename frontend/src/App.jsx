@@ -9,7 +9,7 @@ import Onboarding from './pages/auth/Onboarding';
 
 import Dashboard from './pages/participant/Dashboard';
 import Profile from './pages/participant/Profile';
-import EventsList from './pages/participant/EventsList';
+import BrowseEvents from './pages/participant/BrowseEvents';
 import EventDetails from './pages/participant/EventDetails';
 import ClubsDirectory from './pages/participant/ClubsDirectory';
 import ViewTicket from './pages/participant/ViewTicket';
@@ -36,7 +36,7 @@ function App() {
               <Route path="/" element={<Navigate to="/events" replace />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/events" element={<EventsList />} />
+              <Route path="/events" element={<BrowseEvents />} />
               <Route path="/events/:id" element={<EventDetails />} />
 
               {/* Participant Routes */}
