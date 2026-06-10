@@ -19,7 +19,8 @@
 
 @layer base {
   body { 
-    @apply font-sans bg-bg-dark text-slate-100 min-h-screen leading-relaxed;
+    @apply font-sans text-slate-100 min-h-screen leading-relaxed;
+    background-color: #0a0a0f;
     background-image: 
       radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
       radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
