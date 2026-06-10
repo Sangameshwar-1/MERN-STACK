@@ -48,7 +48,15 @@ const registerForEvent = async (req, res) => {
 
     // Generate QR code
     const ticketId = `FELI-${uuidv4().substring(0, 8).toUpperCase()}`;
-    const qrData = { ticketId, eventId, participantId: req.user._id.toString() };
+    const qrData = { 
+      ticketId, 
+      eventId: event._id.toString(), 
+      eventName: event.eventName,
+      type: event.eventType,
+      participantId: participant._id.toString(),
+      participantName: `${participant.firstName} ${participant.lastName}`,
+      email: participant.email,
+    };
     const qrCode = await generateQRCode(qrData);
 
     // Create ticket

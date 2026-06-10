@@ -81,7 +81,7 @@ const Dashboard = () => {
               <div key={reg._id} className="registration-row">
                 <div className="reg-info">
                   <h4>{reg.event?.eventName || 'Event'}</h4>
-                  <p>{reg.event?.organizer?.name || ''} · {reg.registrationType}</p>
+                  <p>{reg.event?.organizer?.name || ''} · {reg.event?.eventType || reg.registrationType}</p>
                   <p className="reg-date">
                     {reg.event?.eventStartDate ? new Date(reg.event.eventStartDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) : ''}
                   </p>

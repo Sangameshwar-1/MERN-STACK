@@ -25,7 +25,9 @@ const ClubsDirectory = () => {
       
       // Fetch user profile to get followed clubs list
       const profileRes = await api.get('/participants/profile');
-      setFollowedClubs(profileRes.data.followedClubs || []);
+      // Ensure we extract just the IDs since the backend populates them as objects
+      const followedIds = (profileRes.data.followedClubs || []).map(c => typeof c === 'object' ? c._id : c);
+      setFollowedClubs(followedIds);
       
     } catch (err) {
       console.error(err);
