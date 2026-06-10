@@ -62,7 +62,7 @@ const changePassword = async (req, res) => {
 const getOrganizers = async (req, res) => {
   try {
     const organizers = await User.find({ role: 'organizer', isActive: true })
-      .select('name category description')
+      .select('name email category description clubLogoUrl')
       .sort({ name: 1 });
     res.json(organizers);
   } catch (error) {

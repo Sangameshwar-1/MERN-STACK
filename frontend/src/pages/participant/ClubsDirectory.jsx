@@ -91,8 +91,12 @@ const ClubsDirectory = () => {
             return (
               <div key={club._id} className="event-card">
                 <div className="event-card-body text-center" style={{ padding: '2.5rem 1.5rem' }}>
-                  <div className="club-avatar mx-auto mb-4" style={{ margin: '0 auto 1.5rem auto', width: '80px', height: '80px', fontSize: '2rem' }}>
-                    {club.name.charAt(0)}
+                  <div className="club-avatar mx-auto mb-4" style={{ margin: '0 auto 1.5rem auto', width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'var(--surface-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    {club.clubLogoUrl ? (
+                      <img src={club.clubLogoUrl.startsWith('http') ? club.clubLogoUrl : `http://localhost:5000${club.clubLogoUrl}`} alt={club.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ fontSize: '2.5rem' }}>{club.name.charAt(0)}</span>
+                    )}
                   </div>
                   <h3 className="event-name" style={{ marginBottom: '0.5rem' }}>{club.name}</h3>
                   <p className="text-muted mb-4">{club.email}</p>
