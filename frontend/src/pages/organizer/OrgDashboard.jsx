@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
 
 const OrgDashboard = () => {
+  const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [logoPic, setLogoPic] = useState(user?.clubLogoUrl ? `http://localhost:5000${user.clubLogoUrl}` : null);
 
   useEffect(() => {
     api.get('/events/organizer/my-events').then(res => {
@@ -16,12 +20,51 @@ const OrgDashboard = () => {
   const totalRegistrations = events.reduce((sum, e) => sum + e.currentRegistrations, 0);
   const activeEvents = events.filter(e => e.isActive && new Date(e.eventEndDate) > new Date());
 
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+
+    try {
+      setUploading(true);
+      const res = await api.post('/auth/upload-profile', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setLogoPic(`http://localhost:5000${res.data.fileUrl}`);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to upload image');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-header">
-        <div>
-          <h1>Organizer Dashboard 📊</h1>
-          <p>Manage your events and track registrations</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div 
+            style={{ 
+              width: '60px', height: '60px', borderRadius: '8px', 
+              backgroundColor: 'var(--surface-light)', display: 'flex', 
+              alignItems: 'center', justifyContent: 'center', overflow: 'hidden'
+            }}
+          >
+            {logoPic ? (
+              <img src={logoPic} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <span style={{ fontSize: '1.5rem' }}>🏢</span>
+            )}
+          </div>
+          <div>
+            <h1>{user?.name || 'Organizer Dashboard'} 📊</h1>
+            <label style={{ fontSize: '0.8rem', cursor: 'pointer', color: 'var(--primary)' }}>
+              {uploading ? 'Uploading...' : 'Change Club Logo'}
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileUpload} disabled={uploading} />
+            </label>
+          </div>
         </div>
         <Link to="/organizer/events/new" className="btn-primary">+ Create Event</Link>
       </div>

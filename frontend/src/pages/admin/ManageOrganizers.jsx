@@ -109,7 +109,14 @@ const ManageOrganizers = () => {
           <tbody>
             {organizers.map(org => (
               <tr key={org._id}>
-                <td><strong>{org.name}</strong></td>
+                <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  {org.clubLogoUrl ? (
+                    <img src={`http://localhost:5000${org.clubLogoUrl}`} alt="logo" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ fontSize: '1.5rem' }}>🏢</span>
+                  )}
+                  <strong>{org.name}</strong>
+                </td>
                 <td><span className="type-badge sm normal">{org.category}</span></td>
                 <td>{org.email}</td>
                 <td>
