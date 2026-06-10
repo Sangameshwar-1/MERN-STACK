@@ -94,22 +94,24 @@ const EventDetails = () => {
 
   return (
     <div className="event-details-page">
-      <div className="event-hero">
-        <div className="event-hero-content">
-          <div className="event-badges">
-            <span className={`type-badge ${event.eventType}`}>
+      <div className="event-hero enhanced-hero" style={{ background: `linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)`, position: 'relative', overflow: 'hidden' }}>
+        <div className="hero-overlay" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1 }}></div>
+        <div className="event-hero-content" style={{ position: 'relative', zIndex: 2, padding: '4rem 2rem', textAlign: 'center' }}>
+          <div className="event-badges" style={{ justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <span className={`type-badge ${event.eventType}`} style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}>
               {event.eventType === 'merchandise' ? '🛍️ Merchandise' : '🎯 Normal Event'}
             </span>
-            {event.isTeamEvent && <span className="type-badge team">👥 Team Event</span>}
-            <span className={`eligibility-badge`}>{event.eligibility}</span>
+            {event.isTeamEvent && <span className="type-badge team" style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}>👥 Team Event</span>}
+            <span className={`eligibility-badge`} style={{ fontSize: '1rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.2)', color: 'white' }}>{event.eligibility}</span>
           </div>
-          <h1>{event.eventName}</h1>
-          <p className="organizer-name">by {event.organizer?.name}</p>
-          <div className="event-date-info">
-            <span>📅 {new Date(event.eventStartDate).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            {event.registrationFee > 0 && <span>💰 ₹{event.registrationFee}</span>}
+          <h1 style={{ fontSize: '3.5rem', fontWeight: '800', textShadow: '0 4px 12px rgba(0,0,0,0.3)', marginBottom: '1rem' }}>{event.eventName}</h1>
+          <p className="organizer-name" style={{ fontSize: '1.2rem', opacity: 0.9 }}>by <strong>{event.organizer?.name}</strong></p>
+          
+          <div className="event-date-info glass-panel" style={{ display: 'inline-flex', marginTop: '2rem', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', padding: '1rem 2rem', borderRadius: '50px', gap: '2rem', border: '1px solid rgba(255,255,255,0.2)' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📅 {new Date(event.eventStartDate).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+            {event.registrationFee > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>💰 ₹{event.registrationFee}</span>}
             {event.registrationLimit && (
-              <span>👥 {event.currentRegistrations}/{event.registrationLimit} registered</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>👥 {event.currentRegistrations}/{event.registrationLimit} slots</span>
             )}
           </div>
         </div>
@@ -156,13 +158,14 @@ const EventDetails = () => {
             {error && <div className="alert alert-error">{error}</div>}
 
             {ticket && (
-              <div className="ticket-display">
-                <h3>🎫 Your Ticket</h3>
-                <div className="ticket-card">
-                  <p><strong>Ticket ID:</strong> {ticket.ticketId}</p>
-                  <QRCodeSVG value={ticket.ticketId} size={180} />
-                  <p className="ticket-hint">Show this QR at the event entrance</p>
+              <div className="ticket-display" style={{ background: 'linear-gradient(to right, #1a1a2e, #16213e)', borderRadius: '16px', padding: '2rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '100px', height: '100px', background: 'var(--primary)', filter: 'blur(50px)', opacity: 0.5 }}></div>
+                <h3 style={{ color: 'var(--primary)', marginBottom: '1.5rem', fontSize: '1.8rem' }}>🎫 Your VIP Ticket</h3>
+                <div className="ticket-card" style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', display: 'inline-block' }}>
+                  <QRCodeSVG value={ticket.ticketId} size={200} />
                 </div>
+                <p style={{ marginTop: '1.5rem', fontSize: '1.2rem', fontFamily: 'monospace', color: '#a78bfa', letterSpacing: '2px' }}>{ticket.ticketId}</p>
+                <p className="ticket-hint" style={{ color: '#9ca3af', marginTop: '0.5rem' }}>Show this QR at the event entrance</p>
               </div>
             )}
 
