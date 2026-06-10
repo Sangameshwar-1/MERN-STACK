@@ -44,7 +44,7 @@ const ChangePassword = () => {
 
   return (
     <div className="section animated-fade" style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
-      <div className="card glass-panel" style={{ width: '100%', maxWidth: '500px', padding: '2rem' }}>
+      <div className="card glass-panel" style={{ width: '100%', maxWidth: '500px', padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <h2>🔐 Change Password</h2>
         <p className="text-muted" style={{ marginBottom: '2rem' }}>Secure your {user?.role || 'account'} profile.</p>
 

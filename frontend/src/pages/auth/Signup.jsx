@@ -26,7 +26,7 @@ const Signup = () => {
 
   return (
     <div className="auth-page">
-      <div className="auth-card" style={{ maxWidth: '480px' }}>
+      <div className="auth-card glass-panel" style={{ maxWidth: '520px', padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <div className="auth-header">
           <div className="auth-logo">🎪</div>
           <h1>Create Account</h1>

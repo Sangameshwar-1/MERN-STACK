@@ -49,7 +49,7 @@ const Onboarding = () => {
 
   return (
     <div className="onboarding-page">
-      <div className="onboarding-card">
+      <div className="onboarding-card glass-panel" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <div className="onboarding-progress">
           <div className={`progress-step ${step >= 1 ? 'active' : ''}`}>1</div>
           <div className="progress-line" />
