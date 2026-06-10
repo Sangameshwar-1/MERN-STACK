@@ -17,6 +17,7 @@ const seedDatabase = async () => {
     console.log('Cleared existing data');
 
     const clubs = [
+      { name: 'Felicity Core Team', category: 'Fest Team' },
       { name: 'Programming Club', category: 'Tech Club' },
       { name: 'Cultural Council', category: 'Cultural Club' },
       { name: 'Sports Council', category: 'Sports Council' },
@@ -119,7 +120,35 @@ const seedDatabase = async () => {
     }
     console.log(`Created 25 Events`);
 
-    console.log('Database seeded successfully with massive dataset!');
+    // Create Admin Account
+    const admin = new User({
+      firstName: 'Admin',
+      lastName: 'Felicity',
+      email: 'admin@felicity.com',
+      password: 'Admin@123',
+      role: 'admin',
+      participantType: 'iiit',
+      contactNumber: '9999999999',
+      onboardingComplete: true
+    });
+    await admin.save();
+    console.log(`Created Admin Account`);
+
+    console.log('\n=============================================');
+    console.log(' DATABASE SEEDED SUCCESSFULLY! ');
+    console.log('=============================================');
+    console.log('\n🔐 IMPORTANT LOGIN CREDENTIALS 🔐\n');
+    console.log('--- ADMIN ACCOUNT ---');
+    console.log('Email: admin@felicity.com');
+    console.log('Password: Admin@123');
+    console.log('\n--- FELICITY CORE TEAM (ORGANIZER) ---');
+    console.log('Email: felicitycoreteam@iiit.ac.in');
+    console.log('Password: password123');
+    console.log('\n--- SAMPLE PARTICIPANT ---');
+    console.log(`Email: ${savedParticipants[0].email}`);
+    console.log('Password: password123');
+    console.log('=============================================\n');
+
     process.exit(0);
   } catch (error) {
     console.error('Error seeding database:', error);
