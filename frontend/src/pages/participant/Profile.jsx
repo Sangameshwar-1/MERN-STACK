@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 
@@ -156,6 +156,10 @@ const Profile = () => {
             </button>
           </div>
         </div>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+        <Link to="/change-password" className="btn-secondary">🔑 Change My Password</Link>
       </div>
     </div>
   );

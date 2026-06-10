@@ -8,10 +8,11 @@ import Signup from './pages/auth/Signup';
 import Onboarding from './pages/auth/Onboarding';
 
 import Dashboard from './pages/participant/Dashboard';
-import BrowseEvents from './pages/participant/BrowseEvents';
-import EventDetails from './pages/participant/EventDetails';
 import Profile from './pages/participant/Profile';
+import EventsList from './pages/participant/EventsList';
+import EventDetails from './pages/participant/EventDetails';
 import ClubsDirectory from './pages/participant/ClubsDirectory';
+import ViewTicket from './pages/participant/ViewTicket';
 
 import OrgDashboard from './pages/organizer/OrgDashboard';
 import OrgProfile from './pages/organizer/OrgProfile';
@@ -22,6 +23,7 @@ import Participants from './pages/organizer/Participants';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageOrganizers from './pages/admin/ManageOrganizers';
 import PasswordResets from './pages/admin/PasswordResets';
+import ChangePassword from './pages/auth/ChangePassword';
 
 function App() {
   return (
@@ -34,14 +36,17 @@ function App() {
               <Route path="/" element={<Navigate to="/events" replace />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/events" element={<BrowseEvents />} />
+              <Route path="/events" element={<EventsList />} />
               <Route path="/events/:id" element={<EventDetails />} />
 
               {/* Participant Routes */}
               <Route path="/onboarding" element={<ProtectedRoute allowedRoles={['participant']}><Onboarding /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['participant']}><Dashboard /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute allowedRoles={['participant']}><Profile /></ProtectedRoute>} />
-              <Route path="/organizers" element={<ProtectedRoute allowedRoles={['participant']}><ClubsDirectory /></ProtectedRoute>} />
+              <Route path="/participant/profile" element={<ProtectedRoute allowedRoles={['participant']}><Profile /></ProtectedRoute>} />
+              <Route path="/participant/clubs" element={<ProtectedRoute allowedRoles={['participant']}><ClubsDirectory /></ProtectedRoute>} />
+              
+              <Route path="/ticket/:ticketId" element={<ProtectedRoute allowedRoles={['participant', 'organizer', 'admin']}><ViewTicket /></ProtectedRoute>} />
+              <Route path="/change-password" element={<ProtectedRoute allowedRoles={['participant', 'organizer', 'admin']}><ChangePassword /></ProtectedRoute>} />
 
               {/* Organizer Routes */}
               <Route path="/organizer" element={<ProtectedRoute allowedRoles={['organizer']}><OrgDashboard /></ProtectedRoute>} />

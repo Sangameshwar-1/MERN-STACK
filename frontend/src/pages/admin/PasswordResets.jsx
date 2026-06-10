@@ -25,7 +25,8 @@ const PasswordResets = () => {
     if (!window.confirm(`Are you sure you want to ${status} this request?`)) return;
     setProcessingId(id);
     try {
-      await api.put(`/admin/password-resets/${id}`, { status });
+      const action = status === 'approved' ? 'approve' : 'reject';
+      await api.put(`/admin/password-resets/${id}`, { action });
       fetchRequests(); // Refresh list
     } catch (error) {
       console.error('Action failed:', error);
