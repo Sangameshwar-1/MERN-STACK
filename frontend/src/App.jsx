@@ -10,6 +10,8 @@ import Onboarding from './pages/auth/Onboarding';
 import Dashboard from './pages/participant/Dashboard';
 import BrowseEvents from './pages/participant/BrowseEvents';
 import EventDetails from './pages/participant/EventDetails';
+import Profile from './pages/participant/Profile';
+import ClubsDirectory from './pages/participant/ClubsDirectory';
 
 import OrgDashboard from './pages/organizer/OrgDashboard';
 import ManageEvent from './pages/organizer/ManageEvent';
@@ -35,6 +37,8 @@ function App() {
               {/* Participant Routes */}
               <Route path="/onboarding" element={<ProtectedRoute allowedRoles={['participant']}><Onboarding /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['participant']}><Dashboard /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute allowedRoles={['participant']}><Profile /></ProtectedRoute>} />
+              <Route path="/organizers" element={<ProtectedRoute allowedRoles={['participant']}><ClubsDirectory /></ProtectedRoute>} />
 
               {/* Organizer Routes */}
               <Route path="/organizer" element={<ProtectedRoute allowedRoles={['organizer']}><OrgDashboard /></ProtectedRoute>} />
