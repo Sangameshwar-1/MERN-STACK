@@ -118,4 +118,29 @@ const completeOnboarding = async (req, res) => {
   }
 };
 
-module.exports = { registerParticipant, loginUser, getMe, completeOnboarding };
+// @desc    Upload profile picture
+// @route   POST /api/auth/upload-profile
+// @access  Private
+const uploadProfilePicture = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'Please upload a file' });
+    }
+
+    const fileUrl = `/uploads/profiles/${req.file.filename}`;
+    const user = await User.findById(req.user._id);
+
+    if (user.role === 'organizer' || user.role === 'admin') {
+      user.clubLogoUrl = fileUrl;
+    } else {
+      user.profilePictureUrl = fileUrl;
+    }
+
+    await user.save();
+    res.json({ message: 'Profile picture uploaded successfully', fileUrl });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerParticipant, loginUser, getMe, completeOnboarding, uploadProfilePicture };

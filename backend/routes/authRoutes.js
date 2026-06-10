@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { registerParticipant, loginUser, getMe, completeOnboarding } = require('../controllers/authController');
+const { registerParticipant, loginUser, getMe, completeOnboarding, uploadProfilePicture } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
+const upload = require('../middleware/upload');
 
 router.post('/register', registerParticipant);
 router.post('/login', loginUser);
 router.get('/me', protect, getMe);
 router.post('/onboarding', protect, completeOnboarding);
+router.post('/upload-profile', protect, upload.single('profilePicture'), uploadProfilePicture);
 
 module.exports = router;
