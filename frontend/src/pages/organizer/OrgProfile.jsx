@@ -66,7 +66,7 @@ const OrgProfile = () => {
         </div>
       </div>
 
-      <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
+      <div className="card glass-panel" style={{ maxWidth: '600px', margin: '0 auto', padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <h3>🔐 Request Password Reset</h3>
         <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
           If you need to reset your club's password to the default system password, submit a request to the Admin here.

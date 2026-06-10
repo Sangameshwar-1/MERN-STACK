@@ -18,8 +18,8 @@ const Navbar = () => {
   const participantLinks = [
     { path: '/dashboard', label: '🏠 Dashboard' },
     { path: '/events', label: '🎪 Browse Events' },
-    { path: '/organizers', label: '🏛️ Clubs' },
-    { path: '/profile', label: '👤 Profile' },
+    { path: '/participant/clubs', label: '🏛️ Clubs' },
+    { path: '/participant/profile', label: '👤 Profile' },
   ];
 
   const organizerLinks = [
