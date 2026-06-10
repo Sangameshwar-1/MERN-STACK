@@ -33,6 +33,16 @@ const userSchema = new mongoose.Schema({
     enum: ['participant', 'organizer', 'admin'],
     default: 'participant'
   },
+  profilePictureUrl: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  clubLogoUrl: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   // Participant specific fields
   participantType: {
     type: String,
