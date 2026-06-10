@@ -82,7 +82,7 @@ const ManageEvent = () => {
         {!isNew && <button onClick={handleDelete} className="btn-ghost" style={{ color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', padding: '0.5rem 1rem' }}>🗑️ Delete Event</button>}
       </div>
 
-      <div className="card glass-panel" style={{ padding: '3rem', maxWidth: '900px', margin: '0 auto' }}>
+      <div className="card glass-panel" style={{ padding: '3rem', maxWidth: '900px', margin: '0 auto', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit(onSubmit)}>

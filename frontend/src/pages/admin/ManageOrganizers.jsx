@@ -66,7 +66,7 @@ const ManageOrganizers = () => {
       )}
 
       {showAddForm && (
-        <form onSubmit={handleSubmit(onSubmit)} className="card mb-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="card glass-panel mb-5" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
           <h3>Create New Organizer</h3>
           <div className="form-row">
             <div className="form-group">
