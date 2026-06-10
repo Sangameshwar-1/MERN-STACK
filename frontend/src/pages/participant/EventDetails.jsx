@@ -177,7 +177,7 @@ const EventDetails = () => {
             {isFull && <div className="alert alert-error">😔 Registration limit reached.</div>}
 
             {canRegister && (
-              <form onSubmit={handleSubmit(handleRegister)} className="registration-form">
+              <form onSubmit={handleSubmit(handleRegister)} className="registration-form glass-panel" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
                 <h3>📝 Registration Form</h3>
                 {event.customForm?.length > 0 ? (
                   event.customForm.map(field => (
@@ -232,7 +232,7 @@ const EventDetails = () => {
               ))}
             </div>
             {(isRegistered || user?.role === 'organizer') && (
-              <form className="message-form" onSubmit={sendMessage}>
+              <form className="message-form glass-panel" onSubmit={sendMessage} style={{ padding: '1rem', borderRadius: '16px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <input
                   type="text"
                   placeholder="Write a message..."
@@ -251,7 +251,7 @@ const EventDetails = () => {
             {success && <div className="alert alert-success">{success}</div>}
             {error && <div className="alert alert-error">{error}</div>}
             {isRegistered ? (
-              <form onSubmit={handleSubmit(submitFeedback)} className="feedback-form">
+              <form onSubmit={handleSubmit(submitFeedback)} className="feedback-form glass-panel" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)', marginTop: '2rem' }}>
                 <div className="form-group">
                   <label>Rating (1-5 stars)</label>
                   <div className="star-selector">
