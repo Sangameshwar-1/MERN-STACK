@@ -1,0 +1,279 @@
+import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { QRCodeSVG } from 'qrcode.react';
+import { io } from 'socket.io-client';
+import api from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
+
+const EventDetails = () => {
+  const { id } = useParams();
+  const { user } = useAuth();
+  const { register, handleSubmit, reset } = useForm();
+
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [registering, setRegistering] = useState(false);
+  const [ticket, setTicket] = useState(null);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [showForum, setShowForum] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [msgText, setMsgText] = useState('');
+  const [activeTab, setActiveTab] = useState('info');
+  const [isRegistered, setIsRegistered] = useState(false);
+
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    api.get(`/events/${id}`).then(res => { setEvent(res.data); setLoading(false); });
+    if (user?.role === 'participant') {
+      api.get('/registrations/my').then(res => {
+        const reg = res.data.find(r => r.event?._id === id);
+        if (reg) { setIsRegistered(true); setTicket(reg.ticket); }
+      });
+    }
+  }, [id, user]);
+
+  useEffect(() => {
+    if (!showForum) return;
+    api.get(`/forum/${id}`).then(res => setMessages(res.data));
+
+    socketRef.current = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
+    socketRef.current.emit('join-forum', id);
+    socketRef.current.on('new-message', (msg) => setMessages(prev => [...prev, msg]));
+    socketRef.current.on('message-deleted', (msgId) => {
+      setMessages(prev => prev.filter(m => m._id !== msgId));
+    });
+    return () => socketRef.current?.disconnect();
+  }, [id, showForum]);
+
+  const handleRegister = async (formData) => {
+    setRegistering(true);
+    setError('');
+    try {
+      const res = await api.post('/registrations/register', { eventId: id, formResponses: formData });
+      setSuccess('🎉 Registered successfully! Check your email for the ticket.');
+      setTicket(res.data.ticket);
+      setIsRegistered(true);
+      setEvent(prev => ({ ...prev, currentRegistrations: prev.currentRegistrations + 1 }));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed');
+    } finally {
+      setRegistering(false);
+    }
+  };
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (!msgText.trim()) return;
+    try {
+      await api.post(`/forum/${id}`, { content: msgText });
+      setMsgText('');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const submitFeedback = async (data) => {
+    try {
+      await api.post(`/feedback/${id}`, data);
+      setSuccess('Thank you for your anonymous feedback!');
+      reset();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Feedback submission failed');
+    }
+  };
+
+  if (loading) return <div className="loading-spinner large" />;
+  if (!event) return <div className="error-page">Event not found.</div>;
+
+  const isDeadlinePassed = new Date() > new Date(event.registrationDeadline);
+  const isFull = event.registrationLimit && event.currentRegistrations >= event.registrationLimit;
+  const canRegister = user?.role === 'participant' && !isRegistered && !isDeadlinePassed && !isFull;
+
+  return (
+    <div className="event-details-page">
+      <div className="event-hero">
+        <div className="event-hero-content">
+          <div className="event-badges">
+            <span className={`type-badge ${event.eventType}`}>
+              {event.eventType === 'merchandise' ? '🛍️ Merchandise' : '🎯 Normal Event'}
+            </span>
+            {event.isTeamEvent && <span className="type-badge team">👥 Team Event</span>}
+            <span className={`eligibility-badge`}>{event.eligibility}</span>
+          </div>
+          <h1>{event.eventName}</h1>
+          <p className="organizer-name">by {event.organizer?.name}</p>
+          <div className="event-date-info">
+            <span>📅 {new Date(event.eventStartDate).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            {event.registrationFee > 0 && <span>💰 ₹{event.registrationFee}</span>}
+            {event.registrationLimit && (
+              <span>👥 {event.currentRegistrations}/{event.registrationLimit} registered</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="event-tabs">
+        {['info', 'register', 'forum', 'feedback'].map(tab => (
+          <button
+            key={tab}
+            className={`tab ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => { setActiveTab(tab); if (tab === 'forum') setShowForum(true); }}
+          >
+            {tab === 'info' ? '📋 Info' : tab === 'register' ? '📝 Register' : tab === 'forum' ? '💬 Forum' : '⭐ Feedback'}
+          </button>
+        ))}
+      </div>
+
+      <div className="event-content">
+        {activeTab === 'info' && (
+          <div className="event-info">
+            <div className="info-section">
+              <h3>About this Event</h3>
+              <p>{event.eventDescription}</p>
+            </div>
+            <div className="info-grid">
+              <div className="info-item"><strong>Start:</strong> {new Date(event.eventStartDate).toLocaleString('en-IN')}</div>
+              <div className="info-item"><strong>End:</strong> {new Date(event.eventEndDate).toLocaleString('en-IN')}</div>
+              <div className="info-item"><strong>Registration Deadline:</strong> {new Date(event.registrationDeadline).toLocaleString('en-IN')}</div>
+              <div className="info-item"><strong>Fee:</strong> {event.registrationFee > 0 ? `₹${event.registrationFee}` : 'Free'}</div>
+              <div className="info-item"><strong>Eligibility:</strong> {event.eligibility}</div>
+              <div className="info-item"><strong>Type:</strong> {event.eventType}</div>
+            </div>
+            {event.tags?.length > 0 && (
+              <div className="tags-section">
+                {event.tags.map(t => <span key={t} className="tag">#{t}</span>)}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'register' && (
+          <div className="register-section">
+            {success && <div className="alert alert-success">{success}</div>}
+            {error && <div className="alert alert-error">{error}</div>}
+
+            {ticket && (
+              <div className="ticket-display">
+                <h3>🎫 Your Ticket</h3>
+                <div className="ticket-card">
+                  <p><strong>Ticket ID:</strong> {ticket.ticketId}</p>
+                  <QRCodeSVG value={ticket.ticketId} size={180} />
+                  <p className="ticket-hint">Show this QR at the event entrance</p>
+                </div>
+              </div>
+            )}
+
+            {isRegistered && !ticket && <div className="alert alert-success">✅ You are registered for this event.</div>}
+
+            {!user && <div className="alert alert-info">Please <a href="/login">login</a> to register.</div>}
+
+            {isDeadlinePassed && <div className="alert alert-error">⏰ Registration deadline has passed.</div>}
+            {isFull && <div className="alert alert-error">😔 Registration limit reached.</div>}
+
+            {canRegister && (
+              <form onSubmit={handleSubmit(handleRegister)} className="registration-form">
+                <h3>📝 Registration Form</h3>
+                {event.customForm?.length > 0 ? (
+                  event.customForm.map(field => (
+                    <div key={field.fieldName} className="form-group">
+                      <label>{field.label}{field.required && ' *'}</label>
+                      {field.fieldType === 'dropdown' ? (
+                        <select {...register(field.fieldName, { required: field.required })}>
+                          <option value="">Select...</option>
+                          {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      ) : field.fieldType === 'textarea' ? (
+                        <textarea rows={3} {...register(field.fieldName, { required: field.required })} />
+                      ) : (
+                        <input type={field.fieldType} {...register(field.fieldName, { required: field.required })} />
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="form-note">No additional information required. Click below to register.</p>
+                )}
+                <button type="submit" className="btn-primary btn-full" disabled={registering}>
+                  {registering ? <span className="spinner" /> : '🎉 Register Now'}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'forum' && (
+          <div className="forum-section">
+            <h3>💬 Event Discussion</h3>
+            {!user && <div className="alert alert-info">Login and register to participate in the forum.</div>}
+            <div className="messages-list">
+              {messages.map(msg => (
+                <div key={msg._id} className={`message ${msg.isAnnouncement ? 'announcement' : ''} ${msg.isPinned ? 'pinned' : ''}`}>
+                  {msg.isPinned && <span className="pin-badge">📌 Pinned</span>}
+                  {msg.isAnnouncement && <span className="announcement-badge">📢 Announcement</span>}
+                  <div className="message-header">
+                    <strong>{msg.author?.firstName || msg.author?.name}</strong>
+                    <span className="role-badge">{msg.author?.role}</span>
+                    <span className="msg-time">{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                  </div>
+                  <p>{msg.content}</p>
+                  <div className="reactions">
+                    {['👍', '❤️', '😂', '😮'].map(emoji => (
+                      <button key={emoji} className="reaction-btn" onClick={() => api.post(`/forum/message/${msg._id}/react`, { emoji })}>
+                        {emoji} {msg.reactions?.filter(r => r.emoji === emoji).length || ''}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {(isRegistered || user?.role === 'organizer') && (
+              <form className="message-form" onSubmit={sendMessage}>
+                <input
+                  type="text"
+                  placeholder="Write a message..."
+                  value={msgText}
+                  onChange={e => setMsgText(e.target.value)}
+                />
+                <button type="submit" className="btn-primary">Send</button>
+              </form>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'feedback' && (
+          <div className="feedback-section">
+            <h3>⭐ Submit Anonymous Feedback</h3>
+            {success && <div className="alert alert-success">{success}</div>}
+            {error && <div className="alert alert-error">{error}</div>}
+            {isRegistered ? (
+              <form onSubmit={handleSubmit(submitFeedback)} className="feedback-form">
+                <div className="form-group">
+                  <label>Rating (1-5 stars)</label>
+                  <div className="star-selector">
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <label key={n} className="star-option">
+                        <input type="radio" value={n} {...register('rating', { required: true })} />
+                        ⭐
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Comment (optional)</label>
+                  <textarea rows={3} placeholder="Share your thoughts..." {...register('comment')} />
+                </div>
+                <button type="submit" className="btn-primary">Submit Anonymously</button>
+              </form>
+            ) : (
+              <p className="empty-state">You must be registered for this event to submit feedback.</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default EventDetails;
