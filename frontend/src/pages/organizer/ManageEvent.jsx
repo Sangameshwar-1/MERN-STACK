@@ -74,107 +74,117 @@ const ManageEvent = () => {
   if (loading) return <div className="loading-spinner large" />;
 
   return (
-    <div className="manage-event-page section">
-      <div className="flex-between">
-        <h1>{isNew ? '✨ Create Event' : '✏️ Edit Event'}</h1>
-        {!isNew && <button onClick={handleDelete} className="btn-ghost" style={{ color: 'red' }}>Delete Event</button>}
+    <div className="manage-event-page section animated-fade">
+      <div className="dashboard-header" style={{ borderBottom: 'none', marginBottom: '1rem' }}>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {isNew ? '✨ Create New Event' : '✏️ Edit Event'}
+        </h1>
+        {!isNew && <button onClick={handleDelete} className="btn-ghost" style={{ color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', padding: '0.5rem 1rem' }}>🗑️ Delete Event</button>}
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      <div className="card glass-panel" style={{ padding: '3rem', maxWidth: '900px', margin: '0 auto' }}>
+        {error && <div className="alert alert-error">{error}</div>}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="card form-grid">
-        <div className="form-group full-width">
-          <label>Event Name *</label>
-          <input type="text" {...register('eventName', { required: true })} />
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="form-grid">
+            <div className="form-group full-width">
+              <label>Event Name *</label>
+              <input type="text" placeholder="E.g. Hackathon 2024" style={{ fontSize: '1.2rem', padding: '1rem' }} {...register('eventName', { required: true })} />
+            </div>
 
-        <div className="form-group full-width">
-          <label>Description *</label>
-          <textarea rows="4" {...register('eventDescription', { required: true })} />
-        </div>
+            <div className="form-group full-width">
+              <label>Description *</label>
+              <textarea rows="5" placeholder="Describe the awesome things that will happen..." {...register('eventDescription', { required: true })} />
+            </div>
 
-        <div className="form-group">
-          <label>Event Type *</label>
-          <select {...register('eventType', { required: true })}>
-            <option value="normal">Normal Event</option>
-            <option value="merchandise">Merchandise</option>
-          </select>
-        </div>
+            <div className="form-group">
+              <label>Event Type *</label>
+              <select {...register('eventType', { required: true })}>
+                <option value="normal">🎟️ Normal Event</option>
+                <option value="merchandise">👕 Merchandise</option>
+              </select>
+            </div>
 
-        <div className="form-group">
-          <label>Eligibility *</label>
-          <select {...register('eligibility', { required: true })}>
-            <option value="all">Everyone</option>
-            <option value="iiit-only">IIIT Only</option>
-            <option value="non-iiit-only">Non-IIIT Only</option>
-          </select>
-        </div>
+            <div className="form-group">
+              <label>Eligibility *</label>
+              <select {...register('eligibility', { required: true })}>
+                <option value="all">🌍 Everyone</option>
+                <option value="iiit-only">🎓 IIIT Only</option>
+                <option value="non-iiit-only">🚀 Non-IIIT Only</option>
+              </select>
+            </div>
 
-        <div className="form-group">
-          <label>Start Date & Time *</label>
-          <input type="datetime-local" {...register('eventStartDate', { required: true })} />
-        </div>
+            <div className="form-group">
+              <label>Start Date & Time *</label>
+              <input type="datetime-local" {...register('eventStartDate', { required: true })} />
+            </div>
 
-        <div className="form-group">
-          <label>End Date & Time *</label>
-          <input type="datetime-local" {...register('eventEndDate', { required: true })} />
-        </div>
+            <div className="form-group">
+              <label>End Date & Time *</label>
+              <input type="datetime-local" {...register('eventEndDate', { required: true })} />
+            </div>
 
-        <div className="form-group">
-          <label>Registration Deadline *</label>
-          <input type="datetime-local" {...register('registrationDeadline', { required: true })} />
-        </div>
+            <div className="form-group">
+              <label>Registration Deadline *</label>
+              <input type="datetime-local" {...register('registrationDeadline', { required: true })} />
+            </div>
 
-        <div className="form-group">
-          <label>Registration Fee (₹)</label>
-          <input type="number" min="0" {...register('registrationFee')} />
-        </div>
+            <div className="form-group">
+              <label>Tags (comma separated)</label>
+              <input type="text" placeholder="tech, coding, fun" {...register('tags')} />
+            </div>
 
-        <div className="form-group">
-          <label>Max Registrations Limit</label>
-          <input type="number" min="1" placeholder="Leave blank for unlimited" {...register('registrationLimit')} />
-        </div>
+            <div className="form-group">
+              <label>Registration Fee (₹)</label>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>₹</span>
+                <input type="number" min="0" placeholder="0 for Free" style={{ paddingLeft: '2.5rem' }} {...register('registrationFee')} />
+              </div>
+            </div>
 
-        <div className="form-group">
-          <label>Tags (comma separated)</label>
-          <input type="text" placeholder="tech, coding, fun" {...register('tags')} />
-        </div>
+            <div className="form-group">
+              <label>Max Registrations Limit</label>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>👥</span>
+                <input type="number" min="1" placeholder="Leave blank for unlimited" style={{ paddingLeft: '2.5rem' }} {...register('registrationLimit')} />
+              </div>
+            </div>
 
-        {eventType === 'normal' && (
-          <div className="form-group full-width">
-            <label className="checkbox-filter">
-              <input type="checkbox" {...register('isTeamEvent')} />
-              Enable Team Registration
-            </label>
+            {eventType === 'normal' && (
+              <div className="form-group full-width" style={{ background: 'rgba(139, 92, 246, 0.1)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+                <label className="checkbox-filter" style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
+                  <input type="checkbox" {...register('isTeamEvent')} style={{ transform: 'scale(1.2)' }} />
+                  Enable Team Registration
+                </label>
+                {isTeamEvent && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label>Min Team Size</label>
+                      <input type="number" min="1" {...register('minTeamSize')} />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label>Max Team Size</label>
+                      <input type="number" min="1" {...register('maxTeamSize')} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="form-group full-width" style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '2rem' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>📝 Custom Registration Form</h3>
+              <p className="text-muted" style={{ marginBottom: '1.5rem' }}>Add custom text fields, dropdowns, or checkboxes that participants must fill out during registration.</p>
+              <FormBuilder formFields={customForm} setFormFields={setCustomForm} />
+            </div>
+
+            <div className="form-group full-width" style={{ marginTop: '1rem' }}>
+              <button type="submit" className="btn-primary btn-full" disabled={saving} style={{ padding: '1rem', fontSize: '1.1rem' }}>
+                {saving ? <span className="spinner" /> : (isNew ? '🚀 Launch Event' : '💾 Save Changes')}
+              </button>
+            </div>
           </div>
-        )}
-
-        {isTeamEvent && (
-          <>
-            <div className="form-group">
-              <label>Min Team Size</label>
-              <input type="number" min="1" {...register('minTeamSize')} />
-            </div>
-            <div className="form-group">
-              <label>Max Team Size</label>
-              <input type="number" min="1" {...register('maxTeamSize')} />
-            </div>
-          </>
-        )}
-
-        <div className="form-group full-width">
-          <hr />
-          <h3>Custom Registration Form</h3>
-          <p className="text-sm">Add custom fields participants must fill during registration.</p>
-          <FormBuilder formFields={customForm} setFormFields={setCustomForm} />
-        </div>
-
-        <div className="form-group full-width" style={{ marginTop: '20px' }}>
-          <button type="submit" className="btn-primary btn-full" disabled={saving}>
-            {saving ? <span className="spinner" /> : 'Save Event'}
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };
