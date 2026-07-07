@@ -67,13 +67,13 @@ const BrowseEvents = () => {
   return (
     <div className="browse-page">
       <div className="browse-header">
-        <h1>🎪 Browse Events</h1>
+        <h1> Browse Events</h1>
         <p>Discover and register for exciting events at Felicity</p>
       </div>
 
       {trending.length > 0 && (
         <div className="trending-section">
-          <h2>🔥 Trending Now</h2>
+          <h2> Trending Now</h2>
           <div className="trending-list">
             {trending.map((event, i) => (
               <div key={event._id} className="trending-item">
@@ -90,7 +90,7 @@ const BrowseEvents = () => {
 
       <div className="search-filter-bar">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"></span>
           <input
             type="text"
             placeholder="Search events, organizers, tags..."
@@ -129,7 +129,7 @@ const BrowseEvents = () => {
 
       {loading ? (
         <div className="loading-grid">
-          {[...Array(6)].map((_, i) => <div key={i} className="skeleton-card" />)}
+          {[...Array(6)].map((_, i) => <div key={i} className="skeleton-rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" />)}
         </div>
       ) : (
         <>
@@ -137,8 +137,8 @@ const BrowseEvents = () => {
             {events.map(event => <EventCard key={event._id} event={event} />)}
           </div>
           {events.length === 0 && (
-            <div className="empty-state">
-              <span>😔 No events found.</span>
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-800 p-8 text-center animate-in fade-in-50">
+              <span> No events found.</span>
               <p>Try adjusting your search or filters.</p>
             </div>
           )}

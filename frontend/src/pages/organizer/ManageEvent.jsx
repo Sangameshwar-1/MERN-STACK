@@ -75,14 +75,14 @@ const ManageEvent = () => {
 
   return (
     <div className="manage-event-page section animated-fade">
-      <div className="dashboard-header" style={{ borderBottom: 'none', marginBottom: '1rem' }}>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-zinc-800" style={{ borderBottom: 'none', marginBottom: '1rem' }}>
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          {isNew ? '✨ Create New Event' : '✏️ Edit Event'}
+          {isNew ? ' Create New Event' : '️ Edit Event'}
         </h1>
-        {!isNew && <button onClick={handleDelete} className="btn-ghost" style={{ color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', padding: '0.5rem 1rem' }}>🗑️ Delete Event</button>}
+        {!isNew && <button onClick={handleDelete} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-800 hover:text-zinc-50 h-9 px-4 py-2" style={{ color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', padding: '0.5rem 1rem' }}>️ Delete Event</button>}
       </div>
 
-      <div className="card glass-panel" style={{ padding: '3rem', maxWidth: '900px', margin: '0 auto', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ padding: '3rem', maxWidth: '900px', margin: '0 auto', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -100,17 +100,17 @@ const ManageEvent = () => {
             <div className="form-group">
               <label>Event Type *</label>
               <select {...register('eventType', { required: true })}>
-                <option value="normal">🎟️ Normal Event</option>
-                <option value="merchandise">👕 Merchandise</option>
+                <option value="normal">️ Normal Event</option>
+                <option value="merchandise"> Merchandise</option>
               </select>
             </div>
 
             <div className="form-group">
               <label>Eligibility *</label>
               <select {...register('eligibility', { required: true })}>
-                <option value="all">🌍 Everyone</option>
-                <option value="iiit-only">🎓 IIIT Only</option>
-                <option value="non-iiit-only">🚀 Non-IIIT Only</option>
+                <option value="all"> Everyone</option>
+                <option value="iiit-only"> IIIT Only</option>
+                <option value="non-iiit-only"> Non-IIIT Only</option>
               </select>
             </div>
 
@@ -145,7 +145,7 @@ const ManageEvent = () => {
             <div className="form-group">
               <label>Max Registrations Limit</label>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>👥</span>
+                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}></span>
                 <input type="number" min="1" placeholder="Leave blank for unlimited" style={{ paddingLeft: '2.5rem' }} {...register('registrationLimit')} />
               </div>
             </div>
@@ -172,14 +172,14 @@ const ManageEvent = () => {
             )}
 
             <div className="form-group full-width" style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '2rem' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>📝 Custom Registration Form</h3>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}> Custom Registration Form</h3>
               <p className="text-muted" style={{ marginBottom: '1.5rem' }}>Add custom text fields, dropdowns, or checkboxes that participants must fill out during registration.</p>
               <FormBuilder formFields={customForm} setFormFields={setCustomForm} />
             </div>
 
             <div className="form-group full-width" style={{ marginTop: '1rem' }}>
-              <button type="submit" className="btn-primary btn-full" disabled={saving} style={{ padding: '1rem', fontSize: '1.1rem' }}>
-                {saving ? <span className="spinner" /> : (isNew ? '🚀 Launch Event' : '💾 Save Changes')}
+              <button type="submit" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2 btn-full" disabled={saving} style={{ padding: '1rem', fontSize: '1.1rem' }}>
+                {saving ? <span className="spinner" /> : (isNew ? ' Launch Event' : ' Save Changes')}
               </button>
             </div>
           </div>

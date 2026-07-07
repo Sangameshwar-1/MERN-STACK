@@ -1,5 +1,8 @@
 const User = require('../models/User');
 const PasswordResetRequest = require('../models/PasswordResetRequest');
+const Registration = require('../models/Registration');
+const Ticket = require('../models/Ticket');
+const Event = require('../models/Event');
 
 // @desc    Get participant profile
 // @route   GET /api/participants/profile
@@ -87,4 +90,33 @@ const requestPasswordReset = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, changePassword, getOrganizers, requestPasswordReset };
+// @desc    Get participant dashboard stats
+// @route   GET /api/participants/dashboard
+// @access  Private (participant)
+const getDashboardData = async (req, res) => {
+  try {
+    const registrations = await Registration.find({ participant: req.user._id }).populate('event');
+    const upcomingEvents = registrations.filter(r => r.event && new Date(r.event.eventStartDate) >= new Date()).length;
+    const attendedEvents = registrations.filter(r => r.attendanceMarked).length;
+    
+    // Attach tickets to recent registrations
+    const recent = registrations.slice(0, 5);
+    const recentRegistrations = await Promise.all(recent.map(async (reg) => {
+      const ticket = await Ticket.findOne({ registration: reg._id });
+      return { ...reg.toObject(), ticket };
+    }));
+
+    res.json({
+      stats: {
+        totalRegistrations: registrations.length,
+        upcomingEvents,
+        attendedEvents
+      },
+      recentRegistrations
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getProfile, updateProfile, changePassword, getOrganizers, requestPasswordReset, getDashboardData };

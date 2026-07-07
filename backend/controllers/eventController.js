@@ -166,4 +166,27 @@ const getOrganizerEvents = async (req, res) => {
   }
 };
 
-module.exports = { createEvent, getEvents, getTrendingEvents, getEventById, updateEvent, deleteEvent, getOrganizerEvents };
+// @desc    Get organizer dashboard stats
+// @route   GET /api/events/organizer/dashboard
+// @access  Private (organizer)
+const getOrganizerDashboard = async (req, res) => {
+  try {
+    const events = await Event.find({ organizer: req.user._id }).sort({ createdAt: -1 });
+    const totalEvents = events.length;
+    const totalParticipants = events.reduce((acc, ev) => acc + (ev.currentRegistrations || 0), 0);
+    const totalRevenue = events.reduce((acc, ev) => acc + ((ev.currentRegistrations || 0) * (ev.registrationFee || 0)), 0);
+    
+    res.json({
+      stats: {
+        totalEvents,
+        totalParticipants,
+        totalRevenue
+      },
+      recentEvents: events.slice(0, 5)
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { createEvent, getEvents, getTrendingEvents, getEventById, updateEvent, deleteEvent, getOrganizerEvents, getOrganizerDashboard };

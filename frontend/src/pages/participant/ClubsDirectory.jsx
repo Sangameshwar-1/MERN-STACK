@@ -76,15 +76,15 @@ const ClubsDirectory = () => {
 
   return (
     <div className="section animated-fade">
-      <div className="dashboard-header">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-zinc-800">
         <div>
-          <h1>🏛️ Clubs Directory</h1>
+          <h1>️ Clubs Directory</h1>
           <p className="text-muted">Discover and follow student organizations at Felicity.</p>
         </div>
       </div>
 
       {clubs.length === 0 ? (
-        <div className="empty-state">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-800 p-8 text-center animate-in fade-in-50">
           <p>No clubs or organizers found.</p>
         </div>
       ) : (
@@ -92,8 +92,8 @@ const ClubsDirectory = () => {
           {clubs.map(club => {
             const isFollowing = followedClubs.includes(club._id);
             return (
-              <div key={club._id} className="event-card">
-                <div className="event-card-body text-center" style={{ padding: '2.5rem 1.5rem' }}>
+              <div key={club._id} className="event-rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6">
+                <div className="event-rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6-body text-center" style={{ padding: '2.5rem 1.5rem' }}>
                   <div className="club-avatar mx-auto mb-4" style={{ margin: '0 auto 1.5rem auto', width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'var(--surface-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                     {club.clubLogoUrl ? (
                       <img src={club.clubLogoUrl.startsWith('http') ? club.clubLogoUrl : `http://localhost:5000${club.clubLogoUrl}`} alt={club.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -101,16 +101,16 @@ const ClubsDirectory = () => {
                       <span style={{ fontSize: '2.5rem' }}>{club.name.charAt(0)}</span>
                     )}
                   </div>
-                  <h3 className="event-name" style={{ marginBottom: '0.5rem' }}>{club.name}</h3>
+                  <h3 className="font-semibold leading-none tracking-tight text-xl" style={{ marginBottom: '0.5rem' }}>{club.name}</h3>
                   <p className="text-muted mb-4">{club.email}</p>
                   
                   <button 
-                    className={`btn-primary btn-full ${isFollowing ? 'btn-secondary' : ''}`}
+                    className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2 btn-full ${isFollowing ? 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-800 text-zinc-50 hover:bg-zinc-800/80 h-9 px-4 py-2' : ''}`}
                     onClick={() => handleToggleFollow(club._id)}
                     disabled={updatingFollow}
                     style={{ transition: 'all 0.3s' }}
                   >
-                    {isFollowing ? '✓ Following' : '+ Follow Club'}
+                    {isFollowing ? ' Following' : '+ Follow Club'}
                   </button>
                 </div>
               </div>

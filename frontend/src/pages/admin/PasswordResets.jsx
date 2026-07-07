@@ -57,12 +57,12 @@ const PasswordResets = () => {
 
   return (
     <div className="section animated-fade">
-      <div className="dashboard-header">
-        <h1>🔑 Password Reset Requests</h1>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-zinc-800">
+        <h1> Password Reset Requests</h1>
       </div>
 
-      <div className="table-responsive">
-        <table className="data-table">
+      <div className="w-full overflow-auto rounded-md border border-zinc-800">
+        <table className="w-full caption-bottom text-sm">
           <thead>
             <tr>
               <th>Club Name</th>
@@ -86,7 +86,7 @@ const PasswordResets = () => {
                   <td>{req.reason}</td>
                   <td>{new Date(req.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <span className={`status-badge ${req.status}`}>
+                    <span className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 border-transparent bg-zinc-100 text-zinc-900 shadow hover:bg-zinc-100/80 ${req.status}`}>
                       {req.status}
                     </span>
                   </td>
@@ -99,7 +99,7 @@ const PasswordResets = () => {
                           onClick={() => handleAction(req._id, 'approved')}
                           disabled={processingId === req._id}
                         >
-                          {processingId === req._id ? 'Processing...' : '✅ Approve & Reset'}
+                          {processingId === req._id ? 'Processing...' : ' Approve & Reset'}
                         </button>
                         <button 
                           className="btn-sm" 
@@ -107,7 +107,7 @@ const PasswordResets = () => {
                           onClick={() => handleAction(req._id, 'rejected')}
                           disabled={processingId === req._id}
                         >
-                          ❌ Reject
+                           Reject
                         </button>
                       </div>
                     ) : (

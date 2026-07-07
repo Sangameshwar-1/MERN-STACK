@@ -1,125 +1,99 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
-import useAuth from '../../context/useAuth';
+import { PageHeader } from '../../components/ui/PageHeader';
+import { StatsCard } from '../../components/ui/StatsCard';
+import { DataTable } from '../../components/ui/DataTable';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { CalendarDays, Users, Banknote, Plus, SearchX } from 'lucide-react';
 
 const OrgDashboard = () => {
-  const { user } = useAuth();
-  const [events, setEvents] = useState([]);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [logoPic, setLogoPic] = useState(user?.clubLogoUrl ? `http://localhost:5000${user.clubLogoUrl}` : null);
 
   useEffect(() => {
-    api.get('/events/organizer/my-events').then(res => {
-      setEvents(res.data);
+    api.get('/events/organizer/dashboard').then(res => {
+      setData(res.data);
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch(err => {
+      console.error('Failed to load org dashboard:', err);
+      setData({ stats: { totalEvents: 0, totalParticipants: 0, totalRevenue: 0 }, recentEvents: [] });
+      setLoading(false);
+    });
   }, []);
 
-  const totalRegistrations = events.reduce((sum, e) => sum + e.currentRegistrations, 0);
-  const activeEvents = events.filter(e => e.isActive && new Date(e.eventEndDate) > new Date());
+  if (loading) return (
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 animate-pulse">
+      <div className="h-10 w-48 bg-zinc-800 rounded-md mb-8"></div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {[1,2,3].map(i => <div key={i} className="h-28 bg-zinc-800 rounded-xl"></div>)}
+      </div>
+      <div className="h-64 bg-zinc-800 rounded-xl"></div>
+    </div>
+  );
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('profilePicture', file);
-
-    try {
-      setUploading(true);
-      const res = await api.post('/auth/upload-profile', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setLogoPic(`http://localhost:5000${res.data.fileUrl}`);
-    } catch (err) {
-      console.error(err);
-      alert('Failed to upload image');
-    } finally {
-      setUploading(false);
-    }
-  };
+  const columns = [
+    { header: 'Event Name', render: (ev) => <span className="font-semibold">{ev.eventName}</span> },
+    { header: 'Date', render: (ev) => <span className="text-zinc-400">{new Date(ev.eventStartDate).toLocaleDateString()}</span> },
+    { header: 'Registrations', render: (ev) => `${ev.currentRegistrations} / ${ev.registrationLimit}` },
+    { header: 'Status', render: (ev) => {
+        const isOpen = new Date(ev.registrationDeadline) > new Date() && ev.currentRegistrations < ev.registrationLimit;
+        return isOpen ? <Badge variant="success">Open</Badge> : <Badge variant="destructive">Closed</Badge>;
+    }},
+    { header: 'Action', render: (ev) => (
+      <Link to={`/organizer/events/${ev._id}`}>
+        <Button variant="ghost" size="sm">Manage</Button>
+      </Link>
+    )}
+  ];
 
   return (
-    <div className="dashboard-page">
-      <div className="dashboard-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div 
-            style={{ 
-              width: '60px', height: '60px', borderRadius: '8px', 
-              backgroundColor: 'var(--surface-light)', display: 'flex', 
-              alignItems: 'center', justifyContent: 'center', overflow: 'hidden'
-            }}
-          >
-            {logoPic ? (
-              <img src={logoPic} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <span style={{ fontSize: '1.5rem' }}>🏢</span>
-            )}
-          </div>
-          <div>
-            <h1>{user?.name || 'Organizer Dashboard'} 📊</h1>
-            <label style={{ fontSize: '0.8rem', cursor: 'pointer', color: 'var(--primary)' }}>
-              {uploading ? 'Uploading...' : 'Change Club Logo'}
-              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileUpload} disabled={uploading} />
-            </label>
-          </div>
-        </div>
-        <Link to="/organizer/events/new" className="btn-primary">+ Create Event</Link>
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+      <PageHeader 
+        title="Organizer Dashboard"
+        description="Manage your events and view analytics."
+        actions={
+          <Link to="/organizer/events/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" /> Create Event
+            </Button>
+          </Link>
+        }
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <StatsCard title="Total Events" value={data.stats.totalEvents} icon={CalendarDays} />
+        <StatsCard title="Total Participants" value={data.stats.totalParticipants} icon={Users} />
+        <StatsCard title="Total Revenue" value={`₹${data.stats.totalRevenue}`} icon={Banknote} />
       </div>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">🎟️</div>
-          <div className="stat-value">{totalRegistrations}</div>
-          <div className="stat-label">Total Registrations</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">📅</div>
-          <div className="stat-value">{activeEvents.length}</div>
-          <div className="stat-label">Active Events</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">📂</div>
-          <div className="stat-value">{events.length}</div>
-          <div className="stat-label">Total Events</div>
-        </div>
-      </div>
-
-      <div className="section">
-        <h2>My Events</h2>
-        {loading ? (
-          <div className="loading-spinner" />
-        ) : (
-          <div className="registrations-list">
-            {events.map(event => (
-              <div key={event._id} className="registration-row">
-                <div className="reg-info">
-                  <h4>{event.eventName}</h4>
-                  <p>{event.eventType} • {event.currentRegistrations} registered</p>
-                  <p className="reg-date">
-                    {new Date(event.eventStartDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
-                  </p>
-                </div>
-                <div className="reg-meta">
-                  <span className={`status-badge ${event.isActive ? 'confirmed' : 'cancelled'}`}>
-                    {event.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                  <Link to={`/organizer/events/${event._id}`} className="btn-sm">Edit</Link>
-                  <Link to={`/organizer/events/${event._id}/participants`} className="btn-sm">Participants</Link>
-                </div>
-              </div>
-            ))}
-            {events.length === 0 && (
-              <div className="empty-state">
-                <span>You haven&apos;t created any events yet.</span>
-                <Link to="/organizer/events/new">Create your first event →</Link>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Events</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {data.recentEvents?.length > 0 ? (
+            <DataTable 
+              data={data.recentEvents} 
+              columns={columns} 
+            />
+          ) : (
+            <EmptyState 
+              icon={SearchX}
+              title="No events yet"
+              description="Get started by creating your first event."
+              action={
+                <Link to="/organizer/events/new">
+                  <Button variant="outline">Create Event</Button>
+                </Link>
+              }
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     // Redirect to their dashboard
     if (user.role === 'admin') return <Navigate to="/admin" replace />;
     if (user.role === 'organizer') return <Navigate to="/organizer" replace />;
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/participant" replace />;
   }
   return children;
 };

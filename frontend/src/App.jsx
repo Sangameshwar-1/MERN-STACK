@@ -33,15 +33,16 @@ function App() {
           <Navbar />
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<Navigate to="/events" replace />} />
+              <Route path="/" element={<BrowseEvents />} />
+              <Route path="/events/:id" element={<EventDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/events" element={<BrowseEvents />} />
-              <Route path="/events/:id" element={<EventDetails />} />
+              <Route path="/participant/events" element={<ProtectedRoute allowedRoles={['participant']}><BrowseEvents /></ProtectedRoute>} />
+              <Route path="/participant/events/:id" element={<ProtectedRoute allowedRoles={['participant']}><EventDetails /></ProtectedRoute>} />
 
               {/* Participant Routes */}
               <Route path="/onboarding" element={<ProtectedRoute allowedRoles={['participant']}><Onboarding /></ProtectedRoute>} />
-              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['participant']}><Dashboard /></ProtectedRoute>} />
+              <Route path="/participant" element={<ProtectedRoute allowedRoles={['participant']}><Dashboard /></ProtectedRoute>} />
               <Route path="/participant/profile" element={<ProtectedRoute allowedRoles={['participant']}><Profile /></ProtectedRoute>} />
               <Route path="/participant/clubs" element={<ProtectedRoute allowedRoles={['participant']}><ClubsDirectory /></ProtectedRoute>} />
               

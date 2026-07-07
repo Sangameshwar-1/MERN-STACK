@@ -30,7 +30,7 @@ const Participants = () => {
           ? { ...r, attendanceMarked: true, attendanceTimestamp: res.data.timestamp }
           : r
       ));
-      alert(`✅ Attendance marked for ${res.data.participant.firstName}`);
+      alert(` Attendance marked for ${res.data.participant.firstName}`);
     } catch {
       alert('Invalid ticket');
     }
@@ -59,13 +59,13 @@ const Participants = () => {
     <div className="participants-page section">
       <div className="flex-between">
         <div>
-          <h1>👥 Participants</h1>
+          <h1> Participants</h1>
           <p>Manage registrations for {event?.eventName}</p>
         </div>
         <div className="actions">
-          <button className="btn-secondary" onClick={downloadCSV}>⬇️ Export CSV</button>
-          <button className="btn-primary" onClick={() => setShowScanner(!showScanner)}>
-            {showScanner ? 'Close Scanner' : '📷 Scan QR Codes'}
+          <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-800 text-zinc-50 hover:bg-zinc-800/80 h-9 px-4 py-2" onClick={downloadCSV}>⬇️ Export CSV</button>
+          <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2" onClick={() => setShowScanner(!showScanner)}>
+            {showScanner ? 'Close Scanner' : ' Scan QR Codes'}
           </button>
         </div>
       </div>
@@ -77,13 +77,13 @@ const Participants = () => {
       </div>
 
       {showScanner && (
-        <div className="scanner-container card">
+        <div className="scanner-container rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6">
           <QRScanner onScanSuccess={handleScan} />
         </div>
       )}
 
-      <div className="table-responsive">
-        <table className="data-table">
+      <div className="w-full overflow-auto rounded-md border border-zinc-800">
+        <table className="w-full caption-bottom text-sm">
           <thead>
             <tr>
               <th>Name</th>
@@ -100,9 +100,9 @@ const Participants = () => {
                 <td>{reg.participant.firstName} {reg.participant.lastName}</td>
                 <td>{reg.participant.email}</td>
                 <td><span className={`type-badge sm ${reg.participant.participantType}`}>{reg.participant.participantType}</span></td>
-                <td><span className={`status-badge sm ${reg.status}`}>{reg.status}</span></td>
+                <td><span className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 border-transparent bg-zinc-100 text-zinc-900 shadow hover:bg-zinc-100/80 sm ${reg.status}`}>{reg.status}</span></td>
                 <td>
-                  <span className={`status-badge sm ${reg.attendanceMarked ? 'confirmed' : 'pending'}`}>
+                  <span className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 border-transparent bg-zinc-100 text-zinc-900 shadow hover:bg-zinc-100/80 sm ${reg.attendanceMarked ? 'confirmed' : 'pending'}`}>
                     {reg.attendanceMarked ? 'Present' : 'Absent'}
                   </span>
                 </td>
