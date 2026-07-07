@@ -75,14 +75,14 @@ const ManageEvent = () => {
 
   return (
     <div className="manage-event-page section animated-fade">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-zinc-800" style={{ borderBottom: 'none', marginBottom: '1rem' }}>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-white/[0.08]" style={{ borderBottom: 'none', marginBottom: '1rem' }}>
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           {isNew ? ' Create New Event' : '️ Edit Event'}
         </h1>
-        {!isNew && <button onClick={handleDelete} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-800 hover:text-zinc-50 h-9 px-4 py-2" style={{ color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', padding: '0.5rem 1rem' }}>️ Delete Event</button>}
+        {!isNew && <button onClick={handleDelete} className="btn-ghost" style={{ color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', padding: '0.5rem 1rem' }}>️ Delete Event</button>}
       </div>
 
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ padding: '3rem', maxWidth: '900px', margin: '0 auto', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+      <div className="card" style={{ padding: '3rem', maxWidth: '900px', margin: '0 auto', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -178,7 +178,7 @@ const ManageEvent = () => {
             </div>
 
             <div className="form-group full-width" style={{ marginTop: '1rem' }}>
-              <button type="submit" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2 btn-full" disabled={saving} style={{ padding: '1rem', fontSize: '1.1rem' }}>
+              <button type="submit" className="btn-primary btn-full" disabled={saving} style={{ padding: '1rem', fontSize: '1.1rem' }}>
                 {saving ? <span className="spinner" /> : (isNew ? ' Launch Event' : ' Save Changes')}
               </button>
             </div>

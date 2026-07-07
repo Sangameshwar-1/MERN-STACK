@@ -44,7 +44,7 @@ const ChangePassword = () => {
 
   return (
     <div className="section animated-fade" style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ width: '100%', maxWidth: '500px', padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+      <div className="card" style={{ width: '100%', maxWidth: '500px', padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <h2> Change Password</h2>
         <p className="text-muted" style={{ marginBottom: '2rem' }}>Secure your {user?.role || 'account'} profile.</p>
 
@@ -79,7 +79,7 @@ const ChangePassword = () => {
               required 
             />
           </div>
-          <button type="submit" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2 btn-full" disabled={loading}>
+          <button type="submit" className="btn-primary btn-full" disabled={loading}>
             {loading ? 'Changing...' : 'Update Password'}
           </button>
         </form>

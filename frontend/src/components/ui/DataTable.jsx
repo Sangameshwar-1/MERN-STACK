@@ -2,12 +2,12 @@ import React from 'react';
 
 export const DataTable = ({ columns, data, emptyMessage = "No results." }) => {
   return (
-    <div className="w-full overflow-auto rounded-md border border-zinc-800">
+    <div className="w-full overflow-auto table-responsive">
       <table className="w-full caption-bottom text-sm">
-        <thead className="[&_tr]:border-b [&_tr]:border-zinc-800">
-          <tr className="border-b transition-colors hover:bg-zinc-900/50 data-[state=selected]:bg-zinc-800">
+        <thead className="[&_tr]:border-b [&_tr]:border-white/[0.08]">
+          <tr className="border-b transition-colors hover:bg-white/[0.05]/50 data-[state=selected]:bg-white/[0.05]">
             {columns.map((col, i) => (
-              <th key={i} className="h-10 px-4 text-left align-middle font-medium text-zinc-400">
+              <th key={i} className="h-10 px-4 text-left align-middle font-medium text-slate-400">
                 {col.header}
               </th>
             ))}
@@ -16,9 +16,9 @@ export const DataTable = ({ columns, data, emptyMessage = "No results." }) => {
         <tbody className="[&_tr:last-child]:border-0">
           {data.length > 0 ? (
             data.map((row, i) => (
-              <tr key={i} className="border-b border-zinc-800 transition-colors hover:bg-zinc-900/50 data-[state=selected]:bg-zinc-800">
+              <tr key={i} className="border-b border-white/[0.08] transition-colors hover:bg-white/[0.05]/50 data-[state=selected]:bg-white/[0.05]">
                 {columns.map((col, j) => (
-                  <td key={j} className="p-4 align-middle text-zinc-300">
+                  <td key={j} className="p-4 align-middle text-slate-300">
                     {col.render ? col.render(row) : row[col.accessorKey]}
                   </td>
                 ))}
@@ -26,7 +26,7 @@ export const DataTable = ({ columns, data, emptyMessage = "No results." }) => {
             ))
           ) : (
             <tr>
-              <td colSpan={columns.length} className="h-24 text-center text-zinc-500">
+              <td colSpan={columns.length} className="h-24 text-center text-slate-500">
                 {emptyMessage}
               </td>
             </tr>

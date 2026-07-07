@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { X } from 'lucide-react';
 
 const FormBuilder = ({ formFields, setFormFields }) => {
   const [newField, setNewField] = useState({ fieldName: '', fieldType: 'text', label: '', required: false, options: '' });
@@ -27,7 +28,7 @@ const FormBuilder = ({ formFields, setFormFields }) => {
               <p className="text-sm text-gray">{field.fieldName}</p>
               {field.options?.length > 0 && <p className="text-sm text-gray">Options: {field.options.join(', ')}</p>}
             </div>
-            <button type="button" onClick={() => removeField(i)} className="btn-ghost" style={{ color: 'red' }}>✖</button>
+            <button type="button" onClick={() => removeField(i)} className="btn-ghost text-red-500 hover:text-red-400 hover:bg-red-500/10"><X className="w-4 h-4" /></button>
           </div>
         ))}
       </div>

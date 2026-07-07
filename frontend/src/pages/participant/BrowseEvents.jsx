@@ -129,7 +129,7 @@ const BrowseEvents = () => {
 
       {loading ? (
         <div className="loading-grid">
-          {[...Array(6)].map((_, i) => <div key={i} className="skeleton-rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" />)}
+          {[...Array(6)].map((_, i) => <div key={i} className="skeleton-card" />)}
         </div>
       ) : (
         <>
@@ -137,7 +137,7 @@ const BrowseEvents = () => {
             {events.map(event => <EventCard key={event._id} event={event} />)}
           </div>
           {events.length === 0 && (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-800 p-8 text-center animate-in fade-in-50">
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 p-8 text-center animate-in fade-in-50">
               <span> No events found.</span>
               <p>Try adjusting your search or filters.</p>
             </div>

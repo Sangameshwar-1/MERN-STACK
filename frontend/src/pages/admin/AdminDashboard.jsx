@@ -41,11 +41,11 @@ const AdminDashboard = () => {
 
   if (loading) return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 animate-pulse">
-      <div className="h-10 w-48 bg-zinc-800 rounded-md mb-8"></div>
+      <div className="h-10 w-48 bg-white/[0.05] rounded-md mb-8"></div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {[1,2,3,4].map(i => <div key={i} className="h-28 bg-zinc-800 rounded-xl"></div>)}
+        {[1,2,3,4].map(i => <div key={i} className="h-28 bg-white/[0.05] rounded-xl"></div>)}
       </div>
-      <div className="h-64 bg-zinc-800 rounded-xl"></div>
+      <div className="h-64 bg-white/[0.05] rounded-xl"></div>
     </div>
   );
 

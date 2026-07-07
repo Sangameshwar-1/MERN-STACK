@@ -42,8 +42,8 @@ const Login = () => {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-3 items-center text-center">
-          <Link to="/" className="flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 mb-2 hover:bg-zinc-800 transition-colors">
-            <ShieldAlert className="h-6 w-6 text-zinc-100" />
+          <Link to="/" className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.08] mb-2 hover:bg-white/[0.05] transition-colors">
+            <ShieldAlert className="h-6 w-6 text-white" />
           </Link>
           <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
           <CardDescription>Enter your credentials to access your account</CardDescription>
@@ -86,10 +86,10 @@ const Login = () => {
           </form>
         </CardContent>
         
-        <CardFooter className="justify-center border-t border-zinc-800 pt-6">
-          <p className="text-sm text-zinc-400">
+        <CardFooter className="justify-center pt-2">
+          <p className="text-sm text-slate-400">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-zinc-100 hover:underline">
+            <Link to="/signup" className="text-white hover:underline">
               Sign up
             </Link>
           </p>

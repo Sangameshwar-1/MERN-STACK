@@ -72,7 +72,7 @@ const ManageOrganizers = () => {
           <h1>️ Manage Clubs & Organizers</h1>
           <p>Create and manage organizer accounts</p>
         </div>
-        <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2" onClick={() => setShowAddForm(!showAddForm)}>
+        <button className="btn-primary" onClick={() => setShowAddForm(!showAddForm)}>
           {showAddForm ? 'Cancel' : '+ Add Organizer'}
         </button>
       </div>
@@ -85,7 +85,7 @@ const ManageOrganizers = () => {
       )}
 
       {showAddForm && (
-        <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6 mb-5" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <form onSubmit={handleSubmit(onSubmit)} className="card mb-5" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
           <h3>Create New Organizer</h3>
           <div className="form-row">
             <div className="form-group">
@@ -110,11 +110,11 @@ const ManageOrganizers = () => {
             <label>Description</label>
             <textarea rows="3" {...register('description', { required: true })} />
           </div>
-          <button type="submit" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2">Create Account</button>
+          <button type="submit" className="btn-primary">Create Account</button>
         </form>
       )}
 
-      <div className="w-full overflow-auto rounded-md border border-zinc-800">
+      <div className="w-full overflow-auto table-responsive">
         <table className="w-full caption-bottom text-sm">
           <thead>
             <tr>
@@ -139,12 +139,12 @@ const ManageOrganizers = () => {
                 <td><span className="type-badge sm normal">{org.category}</span></td>
                 <td>{org.email}</td>
                 <td>
-                  <span className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 border-transparent bg-zinc-100 text-zinc-900 shadow hover:bg-zinc-100/80 sm ${org.isActive ? 'confirmed' : 'cancelled'}`}>
+                  <span className={`status-badge sm ${org.isActive ? 'confirmed' : 'cancelled'}`}>
                     {org.isActive ? 'Active' : 'Disabled'}
                   </span>
                 </td>
                 <td>
-                  <button onClick={() => toggleStatus(org._id)} className="btn-sm inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-800 hover:text-zinc-50 h-9 px-4 py-2">
+                  <button onClick={() => toggleStatus(org._id)} className="btn-sm btn-ghost">
                     {org.isActive ? 'Disable' : 'Enable'}
                   </button>
                 </td>

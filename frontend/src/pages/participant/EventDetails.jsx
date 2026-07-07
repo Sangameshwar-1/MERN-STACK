@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { ShoppingBag, Target, Users, Info, Ticket, MessageCircle, Star, Clock, Pin, Megaphone, ThumbsUp, Heart, PartyPopper, Rocket } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { QRCodeSVG } from 'qrcode.react';
 import { io } from 'socket.io-client';
@@ -97,11 +98,11 @@ const EventDetails = () => {
       <div className="event-hero enhanced-hero" style={{ background: `linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)`, position: 'relative', overflow: 'hidden' }}>
         <div className="hero-overlay" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1 }}></div>
         <div className="event-hero-content" style={{ position: 'relative', zIndex: 2, padding: '4rem 2rem', textAlign: 'center' }}>
-          <div className="event-badges" style={{ justifyContent: 'center', marginBottom: '1.5rem' }}>
-            <span className={`type-badge ${event.eventType}`} style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}>
-              {event.eventType === 'merchandise' ? '️ Merchandise' : ' Normal Event'}
+          <div className="event-badges flex" style={{ justifyContent: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
+            <span className={`type-badge ${event.eventType} flex items-center`} style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}>
+              {event.eventType === 'merchandise' ? <><ShoppingBag className="w-4 h-4 mr-1.5" /> Merchandise</> : <><Target className="w-4 h-4 mr-1.5" /> Normal Event</>}
             </span>
-            {event.isTeamEvent && <span className="type-badge team" style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}> Team Event</span>}
+            {event.isTeamEvent && <span className="type-badge team flex items-center" style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}><Users className="w-4 h-4 mr-1.5" /> Team Event</span>}
             <span className={`eligibility-badge`} style={{ fontSize: '1rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.2)', color: 'white' }}>{event.eligibility}</span>
           </div>
           <h1 style={{ fontSize: '3.5rem', fontWeight: '800', textShadow: '0 4px 12px rgba(0,0,0,0.3)', marginBottom: '1rem' }}>{event.eventName}</h1>
@@ -124,7 +125,7 @@ const EventDetails = () => {
             className={`tab ${activeTab === tab ? 'active' : ''}`}
             onClick={() => { setActiveTab(tab); if (tab === 'forum') setShowForum(true); }}
           >
-            {tab === 'info' ? ' Info' : tab === 'register' ? ' Register' : tab === 'forum' ? ' Forum' : '⭐ Feedback'}
+            {tab === 'info' ? <><Info className="w-4 h-4" /> Info</> : tab === 'register' ? <><Ticket className="w-4 h-4" /> Register</> : tab === 'forum' ? <><MessageCircle className="w-4 h-4" /> Forum</> : <><Star className="w-4 h-4" /> Feedback</>}
           </button>
         ))}
       </div>
@@ -173,12 +174,12 @@ const EventDetails = () => {
 
             {!user && <div className="alert alert-info">Please <a href="/login">login</a> to register.</div>}
 
-            {isDeadlinePassed && <div className="alert alert-error">⏰ Registration deadline has passed.</div>}
+            {isDeadlinePassed && <div className="alert alert-error"><Clock className="w-5 h-5" /> Registration deadline has passed.</div>}
             {isFull && <div className="alert alert-error"> Registration limit reached.</div>}
 
             {canRegister && (
               <form onSubmit={handleSubmit(handleRegister)} className="registration-form rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                <h3> Registration Form</h3>
+                <h3 className="flex items-center gap-2 mb-6 text-xl font-semibold"><Ticket className="w-5 h-5" /> Registration Form</h3>
                 {event.customForm?.length > 0 ? (
                   event.customForm.map(field => (
                     <div key={field.fieldName} className="form-group">
@@ -208,23 +209,23 @@ const EventDetails = () => {
 
         {activeTab === 'forum' && (
           <div className="forum-section">
-            <h3> Event Discussion</h3>
+            <h3 className="flex items-center gap-2 mb-6 text-xl font-semibold"><MessageCircle className="w-5 h-5" /> Event Discussion</h3>
             {!user && <div className="alert alert-info">Login and register to participate in the forum.</div>}
             <div className="messages-list">
               {messages.map(msg => (
                 <div key={msg._id} className={`message ${msg.isAnnouncement ? 'announcement' : ''} ${msg.isPinned ? 'pinned' : ''}`}>
-                  {msg.isPinned && <span className="pin-badge"> Pinned</span>}
-                  {msg.isAnnouncement && <span className="announcement-badge"> Announcement</span>}
+                  {msg.isPinned && <span className="pin-badge flex items-center gap-1"><Pin className="w-3 h-3" /> Pinned</span>}
+                  {msg.isAnnouncement && <span className="announcement-badge flex items-center gap-1"><Megaphone className="w-3 h-3" /> Announcement</span>}
                   <div className="message-header">
                     <strong>{msg.author?.firstName || msg.author?.name}</strong>
                     <span className="role-badge">{msg.author?.role}</span>
                     <span className="msg-time">{new Date(msg.createdAt).toLocaleTimeString()}</span>
                   </div>
                   <p>{msg.content}</p>
-                  <div className="reactions">
-                    {['', '️', '', ''].map(emoji => (
-                      <button key={emoji} className="reaction-btn" onClick={() => api.post(`/forum/message/${msg._id}/react`, { emoji })}>
-                        {emoji} {msg.reactions?.filter(r => r.emoji === emoji).length || ''}
+                  <div className="reactions mt-3 flex gap-2">
+                    {[{id: 'like', icon: ThumbsUp}, {id: 'love', icon: Heart}, {id: 'party', icon: PartyPopper}, {id: 'rocket', icon: Rocket}].map(reaction => (
+                      <button key={reaction.id} className="reaction-btn flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-1 rounded-md text-xs border border-white/10" onClick={() => api.post(`/forum/message/${msg._id}/react`, { emoji: reaction.id })}>
+                        <reaction.icon className="w-4 h-4 text-slate-300" /> {msg.reactions?.filter(r => r.emoji === reaction.id).length || ''}
                       </button>
                     ))}
                   </div>
@@ -247,18 +248,18 @@ const EventDetails = () => {
 
         {activeTab === 'feedback' && (
           <div className="feedback-section">
-            <h3>⭐ Submit Anonymous Feedback</h3>
+            <h3 className="flex items-center gap-2 mb-6 text-xl font-semibold"><Star className="w-5 h-5" /> Submit Anonymous Feedback</h3>
             {success && <div className="alert alert-success">{success}</div>}
             {error && <div className="alert alert-error">{error}</div>}
             {isRegistered ? (
               <form onSubmit={handleSubmit(submitFeedback)} className="feedback-form rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)', marginTop: '2rem' }}>
                 <div className="form-group">
                   <label>Rating (1-5 stars)</label>
-                  <div className="star-selector">
+                  <div className="star-selector flex gap-2 mt-2">
                     {[1, 2, 3, 4, 5].map(n => (
-                      <label key={n} className="star-option">
-                        <input type="radio" value={n} {...register('rating', { required: true })} />
-                        ⭐
+                      <label key={n} className="star-option cursor-pointer flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-colors">
+                        <input type="radio" className="hidden" value={n} {...register('rating', { required: true })} />
+                        <Star className="w-6 h-6 text-yellow-500" />
                       </label>
                     ))}
                   </div>

@@ -27,17 +27,17 @@ const OrgDashboard = () => {
 
   if (loading) return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 animate-pulse">
-      <div className="h-10 w-48 bg-zinc-800 rounded-md mb-8"></div>
+      <div className="h-10 w-48 bg-white/[0.05] rounded-md mb-8"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {[1,2,3].map(i => <div key={i} className="h-28 bg-zinc-800 rounded-xl"></div>)}
+        {[1,2,3].map(i => <div key={i} className="h-28 bg-white/[0.05] rounded-xl"></div>)}
       </div>
-      <div className="h-64 bg-zinc-800 rounded-xl"></div>
+      <div className="h-64 bg-white/[0.05] rounded-xl"></div>
     </div>
   );
 
   const columns = [
     { header: 'Event Name', render: (ev) => <span className="font-semibold">{ev.eventName}</span> },
-    { header: 'Date', render: (ev) => <span className="text-zinc-400">{new Date(ev.eventStartDate).toLocaleDateString()}</span> },
+    { header: 'Date', render: (ev) => <span className="text-slate-400">{new Date(ev.eventStartDate).toLocaleDateString()}</span> },
     { header: 'Registrations', render: (ev) => `${ev.currentRegistrations} / ${ev.registrationLimit}` },
     { header: 'Status', render: (ev) => {
         const isOpen = new Date(ev.registrationDeadline) > new Date() && ev.currentRegistrations < ev.registrationLimit;

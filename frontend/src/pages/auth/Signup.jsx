@@ -63,8 +63,8 @@ const Signup = () => {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-3 items-center text-center">
-          <Link to="/" className="flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 mb-2 hover:bg-zinc-800 transition-colors">
-            <ShieldAlert className="h-6 w-6 text-zinc-100" />
+          <Link to="/" className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.08] mb-2 hover:bg-white/[0.05] transition-colors">
+            <ShieldAlert className="h-6 w-6 text-white" />
           </Link>
           <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
           <CardDescription>Enter your details to get started</CardDescription>
@@ -101,11 +101,11 @@ const Signup = () => {
             <div className="space-y-3">
               <Label>I am a...</Label>
               <div className="flex gap-4">
-                <label className={`flex-1 flex items-center justify-center p-4 rounded-2xl border cursor-pointer transition-all ${pType === 'iiit' ? 'border-purple-500 bg-purple-500/20 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+                <label className={`flex-1 flex items-center justify-center p-4 rounded-full border cursor-pointer transition-all ${pType === 'iiit' ? 'border-purple-500 bg-purple-500/20 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
                   <input type="radio" value="iiit" className="hidden" {...register('participantType')} />
                   <span className={`font-semibold ${pType === 'iiit' ? 'text-purple-300' : 'text-slate-400'}`}>IIIT Student</span>
                 </label>
-                <label className={`flex-1 flex items-center justify-center p-4 rounded-2xl border cursor-pointer transition-all ${pType === 'non-iiit' ? 'border-pink-500 bg-pink-500/20 shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+                <label className={`flex-1 flex items-center justify-center p-4 rounded-full border cursor-pointer transition-all ${pType === 'non-iiit' ? 'border-pink-500 bg-pink-500/20 shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
                   <input type="radio" value="non-iiit" className="hidden" {...register('participantType')} />
                   <span className={`font-semibold ${pType === 'non-iiit' ? 'text-pink-300' : 'text-slate-400'}`}>Non-IIIT Student</span>
                 </label>
@@ -160,10 +160,10 @@ const Signup = () => {
           </form>
         </CardContent>
         
-        <CardFooter className="justify-center border-t border-zinc-800 pt-6">
-          <p className="text-sm text-zinc-400">
+        <CardFooter className="justify-center pt-2">
+          <p className="text-sm text-slate-400">
             Already have an account?{' '}
-            <Link to="/login" className="text-zinc-100 hover:underline">
+            <Link to="/login" className="text-white hover:underline">
               Log in
             </Link>
           </p>

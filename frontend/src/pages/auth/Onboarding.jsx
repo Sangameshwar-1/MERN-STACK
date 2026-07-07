@@ -41,7 +41,9 @@ const Onboarding = () => {
     try {
       await api.post('/auth/onboarding', formData);
       // Force refresh user data to get onboardingComplete = true
-      window.location.href = '/participant';
+      window.location.href = '/'; 
+      window.location.hash = '#/participant';
+      window.location.reload();
     } catch (err) {
       console.error(err);
     } finally {
@@ -52,16 +54,16 @@ const Onboarding = () => {
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 py-12">
       <Card className="w-full max-w-2xl text-center">
-        <CardHeader className="py-8 border-b border-zinc-800">
+        <CardHeader className="py-8 border-b border-white/[0.08]">
           <CardTitle className="text-3xl font-bold">Welcome, {user?.firstName}!</CardTitle>
           <CardDescription>Let's personalize your Felicity experience.</CardDescription>
         </CardHeader>
         
         <CardContent className="p-8">
           <div className="flex justify-center items-center gap-4 mb-10">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${step >= 1 ? 'border-zinc-100 bg-zinc-100 text-zinc-900' : 'border-zinc-800 text-zinc-500'}`}>1</div>
-            <div className={`h-1 w-16 rounded-full ${step >= 2 ? 'bg-zinc-100' : 'bg-zinc-800'}`}></div>
-            <div className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${step >= 2 ? 'border-zinc-100 bg-zinc-100 text-zinc-900' : 'border-zinc-800 text-zinc-500'}`}>2</div>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${step >= 1 ? 'border-purple-500 bg-purple-500 text-white shadow-[0_0_15px_rgba(139,92,246,0.5)]' : 'border-white/[0.08] text-slate-500'}`}>1</div>
+            <div className={`h-1 w-16 rounded-full ${step >= 2 ? 'bg-purple-500 shadow-[0_0_10px_rgba(139,92,246,0.5)]' : 'bg-white/[0.05]'}`}></div>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${step >= 2 ? 'border-purple-500 bg-purple-500 text-white shadow-[0_0_15px_rgba(139,92,246,0.5)]' : 'border-white/[0.08] text-slate-500'}`}>2</div>
           </div>
 
           {step === 1 && (
@@ -102,7 +104,7 @@ const Onboarding = () => {
                     <button
                       key={interest.id}
                       onClick={() => toggleInterest(interest.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${isSelected ? 'bg-zinc-100 text-zinc-900 border-zinc-100' : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:bg-zinc-800'}`}
+                      className={`flex items-center gap-2 px-6 py-3 rounded-full border transition-all shadow-sm ${isSelected ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-transparent shadow-[0_4px_15px_rgba(139,92,246,0.4)]' : 'bg-white/[0.05] text-slate-400 border-white/[0.08] hover:bg-white/[0.1]'}`}
                     >
                       <Icon className="h-4 w-4" />
                       {interest.label}

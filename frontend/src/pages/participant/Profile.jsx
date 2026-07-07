@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import useAuth from '../../context/useAuth';
+import { PageHeader } from '../../components/ui/PageHeader';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { User, Edit2, Lock, Camera } from 'lucide-react';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -48,7 +52,6 @@ const Profile = () => {
       const res = await api.post('/auth/upload-profile', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      // Optionally refresh user context if needed, or just update local state
       setProfile((current) => current ? { ...current, profilePictureUrl: res.data.fileUrl } : current);
     } catch (err) {
       console.error(err);
@@ -60,108 +63,117 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="section text-center p-5">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 text-center">
         <div className="loading-spinner large"></div>
-        <p className="text-muted">Loading profile details...</p>
+        <p className="text-slate-400 mt-4">Loading profile details...</p>
       </div>
     );
   }
 
   if (error || !profile) {
-    return <div className="alert alert-error">{error || 'Profile not found'}</div>;
+    return <div className="max-w-7xl mx-auto px-4 md:px-8 py-8"><div className="alert alert-error">{error || 'Profile not found'}</div></div>;
   }
 
   return (
-    <div className="section animated-fade">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-zinc-800">
-        <div>
-          <h1> My Profile</h1>
-          <p className="text-muted">Manage your personal information and preferences.</p>
-        </div>
-      </div>
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 animated-fade">
+      <PageHeader 
+        title="My Profile"
+        description="Manage your personal information and preferences."
+      />
 
-      <div className="form-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Personal Details Card */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6">
-          <h3 className="mb-4" style={{ fontSize: '1.5rem', color: 'white' }}>Personal Details</h3>
-          
-          <div className="mb-4 d-flex align-items-center" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div 
-              style={{ 
-                width: '80px', height: '80px', borderRadius: '50%', 
-                backgroundColor: 'var(--surface-light)', display: 'flex', 
-                alignItems: 'center', justifyContent: 'center', overflow: 'hidden'
-              }}
-            >
-              {profilePic ? (
-                <img src={profilePic} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <span style={{ fontSize: '2rem' }}></span>
-              )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Personal Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-6 mb-8">
+              <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center overflow-hidden border border-white/10 relative group">
+                {profilePic ? (
+                  <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-8 h-8 text-slate-400" />
+                )}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity pointer-events-none">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <label className="btn-secondary cursor-pointer inline-flex items-center px-4 py-2 rounded-full text-sm font-medium">
+                  {uploading ? 'Uploading...' : 'Change Picture'}
+                  <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+                </label>
+              </div>
             </div>
-            <div>
-              <label className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-800 text-zinc-50 hover:bg-zinc-800/80 h-9 px-4 py-2" style={{ cursor: 'pointer', display: 'inline-block' }}>
-                {uploading ? 'Uploading...' : 'Change Picture'}
-                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileUpload} disabled={uploading} />
-              </label>
-            </div>
-          </div>
 
-          <div className="mb-4">
-            <p className="text-muted text-sm mb-2">Full Name</p>
-            <p style={{ fontSize: '1.2rem', fontWeight: '600' }}>{user.name || user.firstName + ' ' + user.lastName}</p>
-          </div>
-          
-          <div className="mb-4">
-            <p className="text-muted text-sm mb-2">Email Address</p>
-            <p style={{ fontSize: '1.1rem' }}>{user.email}</p>
-          </div>
-          
-          <div className="mb-4">
-            <p className="text-muted text-sm mb-2">Roll Number / IIIT ID</p>
-            <p style={{ fontSize: '1.1rem', fontFamily: 'monospace', letterSpacing: '1px' }}>{profile.rollNumber || 'N/A'}</p>
-          </div>
-        </div>
+            <div className="space-y-6">
+              <div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Full Name</p>
+                <p className="text-lg font-semibold text-white">{user.name || user.firstName + ' ' + user.lastName}</p>
+              </div>
+              
+              <div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Email Address</p>
+                <p className="text-lg text-slate-200">{user.email}</p>
+              </div>
+              
+              <div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Roll Number / IIIT ID</p>
+                <p className="text-lg font-mono text-slate-300 tracking-wider">{profile.rollNumber || 'N/A'}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Preferences Card */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 className="mb-4" style={{ fontSize: '1.5rem', color: 'white' }}>My Preferences</h3>
-          
-          <div className="mb-4">
-            <p className="text-muted text-sm mb-2">Interests</p>
-            {profile.interests && profile.interests.length > 0 ? (
-              <div className="event-tags mt-2">
-                {profile.interests.map(interest => (
-                  <span key={interest} className="tag" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#a78bfa', borderColor: 'rgba(139, 92, 246, 0.4)' }}>
-                    {interest}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted">No interests selected.</p>
-            )}
-          </div>
-          
-          <div className="mb-5">
-            <p className="text-muted text-sm mb-2">Followed Clubs</p>
-            <p style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-              <span style={{ color: 'var(--primary)' }}>{profile.followedClubs?.length || 0}</span> Clubs
-            </p>
-          </div>
-          
-          <div style={{ marginTop: 'auto' }}>
-            <button 
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-800 text-zinc-50 hover:bg-zinc-800/80 h-9 px-4 py-2 btn-full"
-              onClick={() => navigate('/onboarding')}
-            >
-              Edit Preferences ️
-            </button>
-          </div>
-        </div>
+        <Card className="flex flex-col">
+          <CardHeader>
+            <CardTitle>My Preferences</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col flex-1">
+            <div className="mb-6">
+              <p className="text-sm font-medium text-slate-400 mb-3">Interests</p>
+              {profile.interests && profile.interests.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {profile.interests.map(interest => (
+                    <span key={interest} className="px-3 py-1 text-xs font-medium rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 capitalize">
+                      {interest}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-400 text-sm">No interests selected.</p>
+              )}
+            </div>
+            
+            <div className="mb-8">
+              <p className="text-sm font-medium text-slate-400 mb-1">Followed Clubs</p>
+              <p className="text-xl font-bold text-white">
+                <span className="text-purple-400 mr-2">{profile.followedClubs?.length || 0}</span>
+                Clubs
+              </p>
+            </div>
+            
+            <div className="mt-auto pt-6 border-t border-white/5">
+              <Button 
+                variant="secondary"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => navigate('/onboarding')}
+              >
+                <Edit2 className="w-4 h-4" /> Edit Preferences
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-        <Link to="/change-password" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-800 text-zinc-50 hover:bg-zinc-800/80 h-9 px-4 py-2"> Change My Password</Link>
+      <div className="text-center mt-12">
+        <Link to="/change-password">
+          <Button variant="outline" className="flex items-center gap-2 mx-auto">
+            <Lock className="w-4 h-4" /> Change My Password
+          </Button>
+        </Link>
       </div>
     </div>
   );
