@@ -11,7 +11,9 @@ import { ShieldAlert, AlertCircle, CheckCircle2 } from 'lucide-react';
 const Signup = () => {
   const navigate = useNavigate();
   const { register: authRegister } = useAuth();
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, formState: { errors }, setValue } = useForm({
+    defaultValues: { participantType: 'iiit' }
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -25,6 +27,7 @@ const Signup = () => {
   }
 
   const pwd = watch('password');
+  const pType = watch('participantType');
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -95,12 +98,35 @@ const Signup = () => {
               </div>
             </div>
             
+            <div className="space-y-3">
+              <Label>I am a...</Label>
+              <div className="flex gap-4">
+                <label className={`flex-1 flex items-center justify-center p-4 rounded-2xl border cursor-pointer transition-all ${pType === 'iiit' ? 'border-purple-500 bg-purple-500/20 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+                  <input type="radio" value="iiit" className="hidden" {...register('participantType')} />
+                  <span className={`font-semibold ${pType === 'iiit' ? 'text-purple-300' : 'text-slate-400'}`}>IIIT Student</span>
+                </label>
+                <label className={`flex-1 flex items-center justify-center p-4 rounded-2xl border cursor-pointer transition-all ${pType === 'non-iiit' ? 'border-pink-500 bg-pink-500/20 shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+                  <input type="radio" value="non-iiit" className="hidden" {...register('participantType')} />
+                  <span className={`font-semibold ${pType === 'non-iiit' ? 'text-pink-300' : 'text-slate-400'}`}>Non-IIIT Student</span>
+                </label>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                {...register('email', { required: 'Required' })}
+                {...register('email', { 
+                  required: 'Required',
+                  validate: (val) => {
+                    if (pType === 'iiit') {
+                      const validDomains = ['@students.iiit.ac.in', '@iiit.ac.in', '@research.iiit.ac.in'];
+                      return validDomains.some(d => val.endsWith(d)) || 'IIIT students must use an IIIT email address';
+                    }
+                    return true;
+                  }
+                })}
               />
               {errors.email && <p className="text-xs text-red-400">{errors.email.message}</p>}
             </div>

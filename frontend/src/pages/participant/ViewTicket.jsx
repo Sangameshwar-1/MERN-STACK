@@ -48,7 +48,7 @@ const ViewTicket = () => {
 
         <div style={{ marginTop: '2rem' }}>
           <button onClick={() => window.print()} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-800 text-zinc-50 hover:bg-zinc-800/80 h-9 px-4 py-2" style={{ width: '100%', marginBottom: '0.5rem' }}>️ Print Ticket</button>
-          <Link to="/participant/dashboard" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-800 hover:text-zinc-50 h-9 px-4 py-2" style={{ width: '100%', display: 'block', textAlign: 'center' }}>← Back to Dashboard</Link>
+          <Link to="/participant" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-800 hover:text-zinc-50 h-9 px-4 py-2" style={{ width: '100%', display: 'block', textAlign: 'center' }}>← Back to Dashboard</Link>
         </div>
       </div>
     </div>
