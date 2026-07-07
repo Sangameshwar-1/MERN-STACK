@@ -1,41 +1,42 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { useAuth } from '../../context/AuthContext';
 
 const ClubsDirectory = () => {
   const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
-  
   // State for user's profile to track followed clubs
   const [followedClubs, setFollowedClubs] = useState([]);
   const [updatingFollow, setUpdatingFollow] = useState(false);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    let active = true;
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      // Fetch all clubs
-      const clubsRes = await api.get('/participants/organizers');
-      setClubs(clubsRes.data);
-      
-      // Fetch user profile to get followed clubs list
-      const profileRes = await api.get('/participants/profile');
-      // Ensure we extract just the IDs since the backend populates them as objects
-      const followedIds = (profileRes.data.followedClubs || []).map(c => typeof c === 'object' ? c._id : c);
-      setFollowedClubs(followedIds);
-      
-    } catch (err) {
-      console.error(err);
-      setError('Failed to load clubs. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const clubsRes = await api.get('/participants/organizers');
+        const profileRes = await api.get('/participants/profile');
+
+        if (!active) return;
+
+        setClubs(clubsRes.data);
+        const followedIds = (profileRes.data.followedClubs || []).map(c => typeof c === 'object' ? c._id : c);
+        setFollowedClubs(followedIds);
+      } catch (err) {
+        console.error(err);
+        if (active) setError('Failed to load clubs. Please try again later.');
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    void loadData();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleToggleFollow = async (clubId) => {
     if (updatingFollow) return;

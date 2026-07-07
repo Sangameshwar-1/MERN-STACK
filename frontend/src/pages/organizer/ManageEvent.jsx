@@ -8,7 +8,7 @@ const ManageEvent = () => {
   const { id } = useParams();
   const isNew = id === 'new';
   const navigate = useNavigate();
-  const { register, handleSubmit, reset, watch, setValue } = useForm({
+  const { register, handleSubmit, reset, watch } = useForm({
     defaultValues: { eventType: 'normal', eligibility: 'all' }
   });
 

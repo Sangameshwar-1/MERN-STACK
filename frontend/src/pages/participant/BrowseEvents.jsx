@@ -1,9 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import EventCard from '../../components/EventCard';
-
-const EVENT_TYPES = ['', 'normal', 'merchandise'];
-const ELIGIBILITY = ['', 'all', 'iiit-only', 'non-iiit-only'];
 
 const BrowseEvents = () => {
   const [events, setEvents] = useState([]);
@@ -13,7 +10,38 @@ const BrowseEvents = () => {
   const [filters, setFilters] = useState({ eventType: '', eligibility: '', followedClubs: false });
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
 
-  const fetchEvents = useCallback(async (page = 1) => {
+  useEffect(() => {
+    let active = true;
+
+    const loadEvents = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams({ page: 1, limit: 12 });
+        if (search) params.append('search', search);
+        if (filters.eventType) params.append('eventType', filters.eventType);
+        if (filters.eligibility) params.append('eligibility', filters.eligibility);
+        if (filters.followedClubs) params.append('followedClubs', 'true');
+
+        const { data } = await api.get(`/events?${params}`);
+        if (!active) return;
+
+        setEvents(data.events);
+        setPagination({ page: data.page, pages: data.pages, total: data.total });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    void loadEvents();
+
+    return () => {
+      active = false;
+    };
+  }, [search, filters]);
+
+  const fetchEvents = async (page = 1) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page, limit: 12 });
@@ -30,9 +58,7 @@ const BrowseEvents = () => {
     } finally {
       setLoading(false);
     }
-  }, [search, filters]);
-
-  useEffect(() => { fetchEvents(1); }, [fetchEvents]);
+  };
 
   useEffect(() => {
     api.get('/events/trending').then(res => setTrending(res.data));

@@ -7,19 +7,25 @@ const OrgEvents = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    let active = true;
 
-  const fetchEvents = async () => {
-    try {
-      const res = await api.get('/events/organizer/my-events');
-      setEvents(res.data);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadEvents = async () => {
+      try {
+        const res = await api.get('/events/organizer/my-events');
+        if (active) setEvents(res.data);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    void loadEvents();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   if (loading) return <div className="loading-spinner large" />;
 

@@ -1,14 +1,12 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState } from 'react';
 import api from '../utils/api';
-
-const AuthContext = createContext(null);
+import AuthContext from './authContext';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem('felicity_user');
     return stored ? JSON.parse(stored) : null;
   });
-  const [loading, setLoading] = useState(false);
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
@@ -39,14 +37,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateUser, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
-  return ctx;
 };

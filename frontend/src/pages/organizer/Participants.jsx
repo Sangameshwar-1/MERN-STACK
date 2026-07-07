@@ -31,8 +31,8 @@ const Participants = () => {
           : r
       ));
       alert(`✅ Attendance marked for ${res.data.participant.firstName}`);
-    } catch (err) {
-      alert(err.response?.data?.message || 'Invalid ticket');
+    } catch {
+      alert('Invalid ticket');
     }
   };
 
@@ -46,7 +46,7 @@ const Participants = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (err) {
+    } catch {
       console.error('Failed to download CSV');
     }
   };

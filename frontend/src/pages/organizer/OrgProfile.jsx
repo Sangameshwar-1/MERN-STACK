@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
-import { useAuth } from '../../context/AuthContext';
 
 const OrgProfile = () => {
-  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [requestingReset, setRequestingReset] = useState(false);

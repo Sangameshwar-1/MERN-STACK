@@ -8,7 +8,7 @@ const ManageOrganizers = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset } = useForm();
 
   const fetchOrganizers = async () => {
     try {
@@ -21,7 +21,26 @@ const ManageOrganizers = () => {
     }
   };
 
-  useEffect(() => { fetchOrganizers(); }, []);
+  useEffect(() => {
+    let active = true;
+
+    const loadOrganizers = async () => {
+      try {
+        const res = await api.get('/admin/organizers');
+        if (active) setOrganizers(res.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    void loadOrganizers();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const onSubmit = async (data) => {
     try {
@@ -30,8 +49,8 @@ const ManageOrganizers = () => {
       reset();
       fetchOrganizers();
       setShowAddForm(false);
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to create organizer');
+    } catch {
+      alert('Failed to create organizer');
     }
   };
 
@@ -39,7 +58,7 @@ const ManageOrganizers = () => {
     try {
       await api.put(`/admin/organizers/${id}/toggle`);
       fetchOrganizers();
-    } catch (err) {
+    } catch {
       alert('Failed to update status');
     }
   };

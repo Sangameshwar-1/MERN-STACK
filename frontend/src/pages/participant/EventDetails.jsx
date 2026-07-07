@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { QRCodeSVG } from 'qrcode.react';
 import { io } from 'socket.io-client';
 import api from '../../utils/api';
-import { useAuth } from '../../context/AuthContext';
+import useAuth from '../../context/useAuth';
 
 const EventDetails = () => {
   const { id } = useParams();

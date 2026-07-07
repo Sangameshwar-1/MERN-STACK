@@ -6,10 +6,6 @@ const PasswordResets = () => {
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
 
-  useEffect(() => {
-    fetchRequests();
-  }, []);
-
   const fetchRequests = async () => {
     try {
       const res = await api.get('/admin/password-resets');
@@ -20,6 +16,27 @@ const PasswordResets = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    let active = true;
+
+    const loadRequests = async () => {
+      try {
+        const res = await api.get('/admin/password-resets');
+        if (active) setRequests(res.data);
+      } catch (error) {
+        console.error('Error fetching password reset requests:', error);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    void loadRequests();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleAction = async (id, status) => {
     if (!window.confirm(`Are you sure you want to ${status} this request?`)) return;

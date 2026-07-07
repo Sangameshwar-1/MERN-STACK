@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
 const QRScanner = ({ onScanSuccess }) => {
-  const scannerRef = useRef(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -22,7 +21,7 @@ const QRScanner = ({ onScanSuccess }) => {
           } else {
             setError('Invalid Felicity QR Code');
           }
-        } catch (e) {
+        } catch {
           if (decodedText.startsWith('FELI-') || decodedText.startsWith('TEAM-')) {
             onScanSuccess(decodedText);
           } else {
@@ -30,11 +29,11 @@ const QRScanner = ({ onScanSuccess }) => {
           }
         }
       },
-      (err) => { /* ignore normal scan errors */ }
+      () => { /* ignore normal scan errors */ }
     );
 
     return () => {
-      scanner.clear().catch(e => console.error("Failed to clear scanner", e));
+      scanner.clear().catch(() => console.error('Failed to clear scanner'));
     };
   }, [onScanSuccess]);
 

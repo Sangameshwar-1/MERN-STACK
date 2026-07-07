@@ -1,38 +1,40 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
-import { useAuth } from '../../context/AuthContext';
+import useAuth from '../../context/useAuth';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [profilePic, setProfilePic] = useState(null);
 
-  const { user, login } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    let active = true;
+
     const fetchProfile = async () => {
       try {
         const res = await api.get('/participants/profile');
-        setProfile(res.data);
+        if (active) setProfile(res.data);
       } catch (err) {
         console.error(err);
-        setError('Failed to load profile. Please try again.');
+        if (active) setError('Failed to load profile. Please try again.');
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
-    fetchProfile();
+
+    void fetchProfile();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  useEffect(() => {
-    if (profile?.profilePictureUrl) {
-      setProfilePic(`http://localhost:5000${profile.profilePictureUrl}`);
-    }
-  }, [profile]);
+  const profilePic = profile?.profilePictureUrl ? `http://localhost:5000${profile.profilePictureUrl}` : null;
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -47,7 +49,7 @@ const Profile = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       // Optionally refresh user context if needed, or just update local state
-      setProfilePic(`http://localhost:5000${res.data.fileUrl}`);
+      setProfile((current) => current ? { ...current, profilePictureUrl: res.data.fileUrl } : current);
     } catch (err) {
       console.error(err);
       alert('Failed to upload image');

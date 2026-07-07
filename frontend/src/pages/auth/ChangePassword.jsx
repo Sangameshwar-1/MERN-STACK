@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import api from '../../utils/api';
-import { useAuth } from '../../context/AuthContext';
+import useAuth from '../../context/useAuth';
 
 const ChangePassword = () => {
   const { user } = useAuth();
