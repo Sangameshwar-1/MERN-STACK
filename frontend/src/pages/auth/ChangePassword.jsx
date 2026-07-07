@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import api from '../../utils/api';
 import useAuth from '../../context/useAuth';
+import { Eye, EyeOff } from 'lucide-react';
 
 const ChangePassword = () => {
   const { user } = useAuth();
@@ -10,6 +11,10 @@ const ChangePassword = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +31,6 @@ const ChangePassword = () => {
 
     setLoading(true);
     try {
-      // The endpoint is the same for participants and organizers
       const res = await api.put('/participants/change-password', {
         currentPassword,
         newPassword
@@ -43,44 +47,89 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="section animated-fade" style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
-      <div className="card" style={{ width: '100%', maxWidth: '500px', padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-        <h2> Change Password</h2>
-        <p className="text-muted" style={{ marginBottom: '2rem' }}>Secure your {user?.role || 'account'} profile.</p>
+    <div className="max-w-md mx-auto py-12 px-4 sm:px-6 animated-fade">
+      <div className="bg-[#09090b] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl">
+        <h2 className="text-xl font-semibold text-white tracking-tight">Change Password</h2>
+        <p className="text-sm text-slate-400 mt-1 mb-6">Secure your account with a new password.</p>
 
-        {message && <div className="alert alert-success">{message}</div>}
-        {error && <div className="alert alert-error">{error}</div>}
+        {message && (
+          <div className="alert alert-success mb-6 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-emerald-200 text-sm">
+            {message}
+          </div>
+        )}
+        {error && (
+          <div className="alert alert-error mb-6 bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-200 text-sm">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="form-group">
-            <label>Current Password</label>
-            <input 
-              type="password" 
-              value={currentPassword} 
-              onChange={e => setCurrentPassword(e.target.value)} 
-              required 
-            />
+            <label className="block text-slate-300 text-sm font-medium mb-1.5">Current Password</label>
+            <div className="relative">
+              <input 
+                type={showCurrent ? 'text' : 'password'} 
+                value={currentPassword} 
+                onChange={e => setCurrentPassword(e.target.value)} 
+                required 
+                className="w-full pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrent(!showCurrent)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+              >
+                {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
+
           <div className="form-group">
-            <label>New Password</label>
-            <input 
-              type="password" 
-              value={newPassword} 
-              onChange={e => setNewPassword(e.target.value)} 
-              required 
-            />
+            <label className="block text-slate-300 text-sm font-medium mb-1.5">New Password</label>
+            <div className="relative">
+              <input 
+                type={showNew ? 'text' : 'password'} 
+                value={newPassword} 
+                onChange={e => setNewPassword(e.target.value)} 
+                required 
+                className="w-full pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNew(!showNew)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+              >
+                {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
+
           <div className="form-group">
-            <label>Confirm New Password</label>
-            <input 
-              type="password" 
-              value={confirmPassword} 
-              onChange={e => setConfirmPassword(e.target.value)} 
-              required 
-            />
+            <label className="block text-slate-300 text-sm font-medium mb-1.5">Confirm New Password</label>
+            <div className="relative">
+              <input 
+                type={showConfirm ? 'text' : 'password'} 
+                value={confirmPassword} 
+                onChange={e => setConfirmPassword(e.target.value)} 
+                required 
+                className="w-full pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+              >
+                {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
-          <button type="submit" className="btn-primary btn-full" disabled={loading}>
-            {loading ? 'Changing...' : 'Update Password'}
+
+          <button 
+            type="submit" 
+            className="w-full bg-white hover:bg-slate-200 text-black font-semibold py-2.5 px-4 rounded-xl text-sm transition-all duration-200 mt-2" 
+            disabled={loading}
+          >
+            {loading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
       </div>

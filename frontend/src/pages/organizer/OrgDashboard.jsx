@@ -3,10 +3,8 @@ import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { StatsCard } from '../../components/ui/StatsCard';
-import { DataTable } from '../../components/ui/DataTable';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { CalendarDays, Users, Banknote, Plus, SearchX } from 'lucide-react';
 
@@ -35,29 +33,14 @@ const OrgDashboard = () => {
     </div>
   );
 
-  const columns = [
-    { header: 'Event Name', render: (ev) => <span className="font-semibold">{ev.eventName}</span> },
-    { header: 'Date', render: (ev) => <span className="text-slate-400">{new Date(ev.eventStartDate).toLocaleDateString()}</span> },
-    { header: 'Registrations', render: (ev) => `${ev.currentRegistrations} / ${ev.registrationLimit}` },
-    { header: 'Status', render: (ev) => {
-        const isOpen = new Date(ev.registrationDeadline) > new Date() && ev.currentRegistrations < ev.registrationLimit;
-        return isOpen ? <Badge variant="success">Open</Badge> : <Badge variant="destructive">Closed</Badge>;
-    }},
-    { header: 'Action', render: (ev) => (
-      <Link to={`/organizer/events/${ev._id}`}>
-        <Button variant="ghost" size="sm">Manage</Button>
-      </Link>
-    )}
-  ];
-
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 animated-fade">
       <PageHeader 
         title="Organizer Dashboard"
-        description="Manage your events and view analytics."
+        description="Track metrics and configure your active club events."
         actions={
           <Link to="/organizer/events/new">
-            <Button>
+            <Button className="rounded-xl">
               <Plus className="mr-2 h-4 w-4" /> Create Event
             </Button>
           </Link>
@@ -70,16 +53,55 @@ const OrgDashboard = () => {
         <StatsCard title="Total Revenue" value={`₹${data.stats.totalRevenue}`} icon={Banknote} />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Events</CardTitle>
+      <Card className="rounded-2xl border border-white/10 bg-[#09090b]">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-white/5 pb-4">
+          <CardTitle className="text-lg font-semibold text-white">Recent Events</CardTitle>
+          {data.recentEvents?.length > 0 && (
+            <Link to="/organizer/events" className="text-xs text-slate-400 hover:text-white transition-colors">
+              View all
+            </Link>
+          )}
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {data.recentEvents?.length > 0 ? (
-            <DataTable 
-              data={data.recentEvents} 
-              columns={columns} 
-            />
+            <div className="space-y-4">
+              {data.recentEvents.map(event => {
+                const isOpen = new Date(event.registrationDeadline) > new Date() && event.currentRegistrations < event.registrationLimit;
+                return (
+                  <div 
+                    key={event._id} 
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-white/[0.01] border border-white/5 rounded-xl hover:bg-white/[0.03] transition-all"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="font-semibold text-white text-base">{event.eventName}</h3>
+                        <span className={`text-[10px] py-0.5 px-2 rounded-full uppercase border font-medium ${
+                          isOpen 
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                            : 'bg-red-500/10 text-red-400 border-red-500/20'
+                        }`}>
+                          {isOpen ? 'Open' : 'Closed'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-slate-400 flex-wrap">
+                        <span>{new Date(event.eventStartDate).toLocaleDateString(undefined, { dateStyle: 'medium' })}</span>
+                        <span className="hidden sm:inline h-3 w-px bg-white/10"></span>
+                        <span>{event.currentRegistrations} / {event.registrationLimit || '∞'} registrations</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center w-full sm:w-auto">
+                      <Link 
+                        to={`/organizer/events/${event._id}`} 
+                        className="w-full sm:w-auto text-center bg-white/5 border border-white/10 hover:bg-white/10 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-all"
+                      >
+                        Manage
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
             <EmptyState 
               icon={SearchX}
@@ -87,7 +109,7 @@ const OrgDashboard = () => {
               description="Get started by creating your first event."
               action={
                 <Link to="/organizer/events/new">
-                  <Button variant="outline">Create Event</Button>
+                  <Button variant="outline" className="rounded-xl">Create Event</Button>
                 </Link>
               }
             />

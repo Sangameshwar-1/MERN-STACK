@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Label } from '../../components/ui/Label';
-import { ShieldAlert, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -17,6 +17,8 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { user } = useAuth();
   
@@ -99,15 +101,23 @@ const Signup = () => {
             </div>
             
             <div className="space-y-3">
-              <Label>I am a...</Label>
-              <div className="flex gap-4">
-                <label className={`flex-1 flex items-center justify-center p-4 rounded-full border cursor-pointer transition-all ${pType === 'iiit' ? 'border-purple-500 bg-purple-500/20 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+              <Label className="text-xs uppercase tracking-wider text-slate-400 font-medium">I am a...</Label>
+              <div className="flex gap-3">
+                <label className={`flex-1 flex items-center justify-center py-3.5 px-4 rounded-xl border cursor-pointer transition-all ${
+                  pType === 'iiit' 
+                    ? 'border-white bg-white/5 text-white' 
+                    : 'border-white/10 bg-transparent text-slate-400 hover:bg-white/[0.02]'
+                }`}>
                   <input type="radio" value="iiit" className="hidden" {...register('participantType')} />
-                  <span className={`font-semibold ${pType === 'iiit' ? 'text-purple-300' : 'text-slate-400'}`}>IIIT Student</span>
+                  <span className="text-sm font-semibold">IIIT Student</span>
                 </label>
-                <label className={`flex-1 flex items-center justify-center p-4 rounded-full border cursor-pointer transition-all ${pType === 'non-iiit' ? 'border-pink-500 bg-pink-500/20 shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+                <label className={`flex-1 flex items-center justify-center py-3.5 px-4 rounded-xl border cursor-pointer transition-all ${
+                  pType === 'non-iiit' 
+                    ? 'border-white bg-white/5 text-white' 
+                    : 'border-white/10 bg-transparent text-slate-400 hover:bg-white/[0.02]'
+                }`}>
                   <input type="radio" value="non-iiit" className="hidden" {...register('participantType')} />
-                  <span className={`font-semibold ${pType === 'non-iiit' ? 'text-pink-300' : 'text-slate-400'}`}>Non-IIIT Student</span>
+                  <span className="text-sm font-semibold">External Student</span>
                 </label>
               </div>
             </div>
@@ -133,24 +143,44 @@ const Signup = () => {
             
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                {...register('password', { required: 'Required', minLength: { value: 6, message: 'Minimum 6 chars' } })}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  className="pr-10"
+                  {...register('password', { required: 'Required', minLength: { value: 6, message: 'Minimum 6 chars' } })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.password && <p className="text-xs text-red-400">{errors.password.message}</p>}
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                {...register('confirmPassword', { 
-                  required: 'Required',
-                  validate: val => val === pwd || 'Passwords do not match'
-                })}
-              />
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  className="pr-10"
+                  {...register('confirmPassword', { 
+                    required: 'Required',
+                    validate: val => val === pwd || 'Passwords do not match'
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.confirmPassword && <p className="text-xs text-red-400">{errors.confirmPassword.message}</p>}
             </div>
             

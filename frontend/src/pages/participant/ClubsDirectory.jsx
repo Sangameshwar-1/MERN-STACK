@@ -5,7 +5,6 @@ const ClubsDirectory = () => {
   const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // State for user's profile to track followed clubs
   const [followedClubs, setFollowedClubs] = useState([]);
   const [updatingFollow, setUpdatingFollow] = useState(false);
 
@@ -63,56 +62,70 @@ const ClubsDirectory = () => {
 
   if (loading) {
     return (
-      <div className="section text-center p-5">
-        <div className="loading-spinner large"></div>
-        <p className="text-muted">Loading clubs directory...</p>
+      <div className="flex h-[60vh] w-full items-center justify-center">
+        <div className="loading-spinner w-10 h-10 border-2" />
       </div>
     );
   }
 
   if (error) {
-    return <div className="alert alert-error">{error}</div>;
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="alert alert-error bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-200 text-sm">
+          {error}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="section animated-fade">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-white/[0.08]">
-        <div>
-          <h1>️ Clubs Directory</h1>
-          <p className="text-muted">Discover and follow student organizations at Felicity.</p>
-        </div>
+    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 animated-fade">
+      {/* Header */}
+      <div className="pb-6 mb-8 border-b border-white/10">
+        <h1 className="text-3xl font-bold text-white tracking-tight">Clubs Directory</h1>
+        <p className="text-sm text-slate-400 mt-1">Discover and follow student organizations at Felicity</p>
       </div>
 
       {clubs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 p-8 text-center animate-in fade-in-50">
-          <p>No clubs or organizers found.</p>
+        <div className="text-center py-16 border border-dashed border-white/10 rounded-xl bg-white/[0.01]">
+          <p className="text-slate-400 text-sm">No clubs or organizers found.</p>
         </div>
       ) : (
-        <div className="events-grid">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {clubs.map(club => {
             const isFollowing = followedClubs.includes(club._id);
             return (
-              <div key={club._id} className="event-card">
-                <div className="event-card-body text-center" style={{ padding: '2.5rem 1.5rem' }}>
-                  <div className="club-avatar mx-auto mb-4" style={{ margin: '0 auto 1.5rem auto', width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'var(--surface-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                    {club.clubLogoUrl ? (
-                      <img src={club.clubLogoUrl.startsWith('http') ? club.clubLogoUrl : `http://localhost:5000${club.clubLogoUrl}`} alt={club.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <span style={{ fontSize: '2.5rem' }}>{club.name.charAt(0)}</span>
-                    )}
-                  </div>
-                  <h3 className="font-semibold leading-none tracking-tight text-xl" style={{ marginBottom: '0.5rem' }}>{club.name}</h3>
-                  <p className="text-muted mb-4">{club.email}</p>
-                  
-                  <button 
-                    className={`btn-primary btn-full ${isFollowing ? 'btn-secondary' : ''}`}
-                    onClick={() => handleToggleFollow(club._id)}
-                    disabled={updatingFollow}
-                    style={{ transition: 'all 0.3s' }}
-                  >
-                    {isFollowing ? ' Following' : '+ Follow Club'}
-                  </button>
+              <div 
+                key={club._id} 
+                className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 flex flex-col items-center text-center hover:bg-white/[0.04] transition-all"
+              >
+                {/* Logo/Avatar */}
+                <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden mb-4 shadow-sm">
+                  {club.clubLogoUrl ? (
+                    <img 
+                      src={club.clubLogoUrl.startsWith('http') ? club.clubLogoUrl : `http://localhost:5000${club.clubLogoUrl}`} 
+                      alt={club.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-2xl font-bold text-slate-400">{club.name.charAt(0)}</span>
+                  )}
                 </div>
+
+                <h3 className="text-lg font-semibold text-white tracking-tight mb-1">{club.name}</h3>
+                <p className="text-xs text-slate-400 mb-6 truncate w-full">{club.email}</p>
+                
+                <button 
+                  onClick={() => handleToggleFollow(club._id)}
+                  disabled={updatingFollow}
+                  className={`w-full py-2 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    isFollowing 
+                      ? 'bg-white/10 border border-white/10 text-white hover:bg-white/20' 
+                      : 'bg-white text-black hover:bg-slate-200'
+                  }`}
+                >
+                  {isFollowing ? 'Following' : 'Follow Club'}
+                </button>
               </div>
             );
           })}

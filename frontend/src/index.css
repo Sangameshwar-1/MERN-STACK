@@ -6,7 +6,7 @@
   --color-secondary: #ec4899;
   --color-bg-dark: #0a0a0f;
   
-  --font-sans: 'Inter', 'Outfit', sans-serif;
+  --font-sans: 'Outfit', 'Inter', sans-serif;
   
   /* Animations */
   --animate-fadeIn: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -48,14 +48,14 @@
   /* Premium Glassmorphism */
   .glass-panel { @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]; }
   
-  .navbar { @apply flex justify-between items-center p-4 md:px-8 bg-black/40 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-50; }
+  .navbar { @apply bg-black/40 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-50; }
   .brand-logo { @apply text-2xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent tracking-tight; }
   .navbar-links { @apply flex gap-8 items-center; }
   .nav-link { @apply font-medium text-slate-300 hover:text-white transition-colors relative; }
   .btn-logout { @apply bg-white/5 text-slate-300 px-6 py-2 rounded-full font-medium border border-white/10 hover:bg-white/10 hover:text-white transition-all; }
   .btn-signup { @apply bg-gradient-to-tr from-purple-500 to-pink-500 text-white px-7 py-2 rounded-full font-bold shadow-[0_0_15px_rgba(139,92,246,0.3)]; }
   
-  .main-content { @apply max-w-7xl mx-auto py-12 px-8; }
+  .main-content { @apply max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8; }
   .section { @apply mt-12; }
   .card { @apply bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] p-8 relative overflow-hidden; }
   .card::before {
@@ -181,12 +181,22 @@
 }
 
 /* Forms */
-input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
-  @apply w-full p-4 px-6 bg-black/20 backdrop-blur-md border border-white/10 rounded-full text-white outline-none transition-all focus:border-purple-500 focus:bg-black/40 focus:shadow-[0_0_15px_rgba(139,92,246,0.2)];
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="datetime-local"] {
+  @apply w-full p-3.5 px-5 bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-xl text-white outline-none transition-all focus:border-purple-500/50 focus:bg-black/30 focus:shadow-[0_0_20px_rgba(139,92,246,0.15)] placeholder-slate-500;
+}
+
+select {
+  @apply w-full p-3.5 px-5 border border-white/10 rounded-xl text-white outline-none transition-all focus:border-purple-500/50 focus:bg-black/30 focus:shadow-[0_0_20px_rgba(139,92,246,0.15)] placeholder-slate-500;
+  background-color: #161620;
+}
+
+textarea {
+  @apply w-full p-4 px-5 bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-2xl text-white outline-none transition-all focus:border-purple-500/50 focus:bg-black/30 focus:shadow-[0_0_20px_rgba(139,92,246,0.15)] placeholder-slate-500;
 }
 
 select option {
-  @apply bg-[#0a0a0f] text-white;
+  background-color: #161620;
+  color: #ffffff;
 }
 
 /* Event Hero */

@@ -11,7 +11,7 @@ const OrgProfile = () => {
   const [reason, setReason] = useState('');
 
   useEffect(() => {
-    api.get('/participants/profile')
+    api.get('/auth/me')
       .then(res => {
         setProfile(res.data);
         setLoading(false);
@@ -38,60 +38,88 @@ const OrgProfile = () => {
     }
   };
 
-  if (loading) return <div className="loading-spinner large" />;
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] w-full items-center justify-center">
+        <div className="loading-spinner w-10 h-10 border-2" />
+      </div>
+    );
+  }
 
   return (
-    <div className="section animated-fade">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-white/[0.08]">
-        <h1> Organizer Profile</h1>
+    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 animated-fade">
+      {/* Header */}
+      <div className="pb-6 mb-8 border-b border-white/10">
+        <h1 className="text-2xl font-semibold text-white tracking-tight">Profile Settings</h1>
+        <p className="text-sm text-slate-400 mt-1">Manage your organizer profile and security requests</p>
       </div>
 
-      <div className="stats-grid" style={{ marginBottom: '2rem' }}>
-        <div className="stat-card">
-          <div className="stat-icon">️</div>
-          <div className="stat-label">Club Name</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white' }}>{profile?.name}</div>
+      {/* Info Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white/[0.02] border border-white/10 rounded-xl p-5">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider">Club Name</div>
+          <div className="text-lg font-semibold text-white mt-1.5">{profile?.name}</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">️</div>
-          <div className="stat-label">Category</div>
-          <div style={{ fontSize: '1.2rem', color: 'white', marginTop: '0.5rem' }}>{profile?.category}</div>
+        <div className="bg-white/[0.02] border border-white/10 rounded-xl p-5">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider">Category</div>
+          <div className="text-lg font-semibold text-white mt-1.5">{profile?.category || 'General'}</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon"></div>
-          <div className="stat-label">Contact Email</div>
-          <div style={{ fontSize: '1rem', color: 'var(--accent)', marginTop: '0.5rem' }}>{profile?.email}</div>
+        <div className="bg-white/[0.02] border border-white/10 rounded-xl p-5">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider">Contact Email</div>
+          <div className="text-lg font-semibold text-purple-400 mt-1.5 truncate" title={profile?.email}>
+            {profile?.email}
+          </div>
         </div>
       </div>
 
-      <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-        <h3> Request Password Reset</h3>
-        <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
-          If you need to reset your club's password to the default system password, submit a request to the Admin here.
+      {/* Reset Request Card */}
+      <div className="bg-[#09090b] border border-white/10 rounded-2xl p-6 sm:p-8 max-w-xl mx-auto shadow-xl">
+        <h3 className="text-lg font-semibold text-white">Request Password Reset</h3>
+        <p className="text-sm text-slate-400 mt-1 mb-6">
+          If you need to reset your club password to the default system password, submit a request to the system administrator.
         </p>
         
-        {resetMessage && <div className="alert alert-success">{resetMessage}</div>}
-        {resetError && <div className="alert alert-error">{resetError}</div>}
+        {resetMessage && (
+          <div className="alert alert-success mb-6 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-emerald-200 text-sm">
+            {resetMessage}
+          </div>
+        )}
+        {resetError && (
+          <div className="alert alert-error mb-6 bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-200 text-sm">
+            {resetError}
+          </div>
+        )}
 
-        <form onSubmit={handlePasswordResetRequest}>
+        <form onSubmit={handlePasswordResetRequest} className="space-y-5">
           <div className="form-group">
-            <label>Reason for reset</label>
+            <label className="block text-slate-300 text-sm font-medium mb-1.5">Reason for reset</label>
             <textarea 
               rows="3" 
-              placeholder="E.g. Handing over club to new batch..."
+              placeholder="e.g., Transitioning club management to next batch..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               required
+              className="w-full"
             />
           </div>
-          <button type="submit" className="btn-primary" disabled={requestingReset}>
+          <button 
+            type="submit" 
+            className="w-full bg-white hover:bg-slate-200 text-black font-semibold py-2.5 px-4 rounded-xl text-sm transition-all duration-200" 
+            disabled={requestingReset}
+          >
             {requestingReset ? 'Submitting...' : 'Submit Request'}
           </button>
         </form>
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-        <Link to="/change-password" className="btn-secondary"> Change My Password</Link>
+      {/* Action Footer Links */}
+      <div className="text-center mt-8 pt-4">
+        <Link 
+          to="/change-password" 
+          className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium py-2.5 px-5 rounded-xl text-sm transition-all"
+        >
+          Change Account Password
+        </Link>
       </div>
     </div>
   );

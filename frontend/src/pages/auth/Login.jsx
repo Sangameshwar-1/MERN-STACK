@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Label } from '../../components/ui/Label';
-import { ShieldAlert, AlertCircle } from 'lucide-react';
+import { ShieldAlert, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
   const { login } = useAuth();
@@ -14,6 +14,7 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { user } = useAuth();
   if (user) {
@@ -71,12 +72,22 @@ const Login = () => {
             
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                {...register('password', { required: 'Password is required' })}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  className="pr-10"
+                  {...register('password', { required: 'Password is required' })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.password && <p className="text-xs text-red-400">{errors.password.message}</p>}
             </div>
             

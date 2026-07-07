@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import EventCard from '../../components/EventCard';
+import { Search } from 'lucide-react';
+import { Select } from '../../components/ui/Select';
 
 const BrowseEvents = () => {
   const [events, setEvents] = useState([]);
@@ -65,22 +67,27 @@ const BrowseEvents = () => {
   }, []);
 
   return (
-    <div className="browse-page">
-      <div className="browse-header">
-        <h1> Browse Events</h1>
-        <p>Discover and register for exciting events at Felicity</p>
+    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 animated-fade">
+      {/* Header */}
+      <div className="pb-6 mb-8 border-b border-white/10">
+        <h1 className="text-3xl font-bold text-white tracking-tight">Browse Events</h1>
+        <p className="text-sm text-slate-400 mt-1">Discover and register for active campus events and club programs</p>
       </div>
 
+      {/* Trending Section */}
       {trending.length > 0 && (
-        <div className="trending-section">
-          <h2> Trending Now</h2>
-          <div className="trending-list">
-            {trending.map((event, i) => (
-              <div key={event._id} className="trending-item">
-                <span className="trending-rank">#{i + 1}</span>
-                <div>
-                  <strong>{event.eventName}</strong>
-                  <p>{event.organizer?.name}</p>
+        <div className="mb-8">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">Trending Now</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {trending.slice(0, 3).map((event, i) => (
+              <div 
+                key={event._id} 
+                className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/10 rounded-xl hover:bg-white/[0.04] transition-all"
+              >
+                <span className="text-xl font-bold text-slate-500 font-mono">0{i + 1}</span>
+                <div className="truncate">
+                  <strong className="text-white font-medium text-sm block truncate">{event.eventName}</strong>
+                  <span className="text-xs text-slate-400 block truncate">{event.organizer?.name}</span>
                 </div>
               </div>
             ))}
@@ -88,68 +95,92 @@ const BrowseEvents = () => {
         </div>
       )}
 
-      <div className="search-filter-bar">
-        <div className="search-box">
-          <span className="search-icon"></span>
+      {/* Search & Filter Bar */}
+      <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 shadow-xl">
+        <div className="relative flex-1 min-w-[280px]">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           <input
             type="text"
             placeholder="Search events, organizers, tags..."
             value={search}
             onChange={e => setSearch(e.target.value)}
+            className="w-full pl-11 pr-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white outline-none text-sm placeholder-slate-500 focus:border-purple-500/50 focus:bg-black/35 transition-all"
           />
         </div>
 
-        <div className="filters">
-          <select value={filters.eventType} onChange={e => setFilters(f => ({ ...f, eventType: e.target.value }))}>
-            <option value="">All Types</option>
-            <option value="normal">Normal</option>
-            <option value="merchandise">Merchandise</option>
-          </select>
+        <div className="flex flex-wrap items-center gap-3">
+          <Select 
+            value={filters.eventType} 
+            onChange={val => setFilters(f => ({ ...f, eventType: val }))}
+            placeholder="All Types"
+            className="w-36 text-xs"
+            options={[
+              { value: '', label: 'All Types' },
+              { value: 'normal', label: 'Standard Event' },
+              { value: 'merchandise', label: 'Merchandise' }
+            ]}
+          />
 
-          <select value={filters.eligibility} onChange={e => setFilters(f => ({ ...f, eligibility: e.target.value }))}>
-            <option value="">All Participants</option>
-            <option value="iiit-only">IIIT Only</option>
-            <option value="non-iiit-only">Non-IIIT Only</option>
-          </select>
+          <Select 
+            value={filters.eligibility} 
+            onChange={val => setFilters(f => ({ ...f, eligibility: val }))}
+            placeholder="All Participants"
+            className="w-40 text-xs"
+            options={[
+              { value: '', label: 'All Participants' },
+              { value: 'iiit-only', label: 'IIIT Only' },
+              { value: 'non-iiit-only', label: 'Non-IIIT Only' }
+            ]}
+          />
 
-          <label className="checkbox-filter">
+          <label className="flex items-center gap-2 text-slate-300 text-xs font-medium cursor-pointer select-none ml-2">
             <input
               type="checkbox"
               checked={filters.followedClubs}
               onChange={e => setFilters(f => ({ ...f, followedClubs: e.target.checked }))}
+              className="w-4 h-4 rounded text-purple-600 bg-black/40 border-white/10"
             />
             Followed Clubs
           </label>
         </div>
       </div>
 
-      <div className="results-info">
-        {!loading && <p>{pagination.total} events found</p>}
+      <div className="text-xs text-slate-400 mb-6 font-mono">
+        {!loading && <span>{pagination.total} events matching filters</span>}
       </div>
 
       {loading ? (
-        <div className="loading-grid">
-          {[...Array(6)].map((_, i) => <div key={i} className="skeleton-card" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-64 bg-white/[0.02] border border-white/5 rounded-2xl animate-pulse" />
+          ))}
         </div>
       ) : (
         <>
-          <div className="events-grid">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map(event => <EventCard key={event._id} event={event} />)}
           </div>
+          
           {events.length === 0 && (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 p-8 text-center animate-in fade-in-50">
-              <span> No events found.</span>
-              <p>Try adjusting your search or filters.</p>
+            <div className="text-center py-16 border border-dashed border-white/10 rounded-xl bg-white/[0.01]">
+              <p className="text-slate-400 text-sm">No events found matching your filter options.</p>
             </div>
           )}
+
           {pagination.pages > 1 && (
-            <div className="pagination">
+            <div className="flex justify-center items-center gap-2 mt-8 pt-4">
               {[...Array(pagination.pages)].map((_, i) => (
                 <button
                   key={i}
-                  className={`page-btn ${pagination.page === i + 1 ? 'active' : ''}`}
+                  className={`w-9 h-9 rounded-lg border text-sm font-medium transition-all ${
+                    pagination.page === i + 1 
+                      ? 'bg-white text-black border-white' 
+                      : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+                  }`}
                   onClick={() => fetchEvents(i + 1)}
-                >{i + 1}</button>
+                >
+                  {i + 1}
+                </button>
               ))}
             </div>
           )}

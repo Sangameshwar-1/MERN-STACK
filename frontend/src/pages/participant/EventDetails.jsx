@@ -94,113 +94,198 @@ const EventDetails = () => {
   const canRegister = user?.role === 'participant' && !isRegistered && !isDeadlinePassed && !isFull;
 
   return (
-    <div className="event-details-page">
-      <div className="event-hero enhanced-hero" style={{ background: `linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)`, position: 'relative', overflow: 'hidden' }}>
-        <div className="hero-overlay" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1 }}></div>
-        <div className="event-hero-content" style={{ position: 'relative', zIndex: 2, padding: '4rem 2rem', textAlign: 'center' }}>
-          <div className="event-badges flex" style={{ justifyContent: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
-            <span className={`type-badge ${event.eventType} flex items-center`} style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}>
-              {event.eventType === 'merchandise' ? <><ShoppingBag className="w-4 h-4 mr-1.5" /> Merchandise</> : <><Target className="w-4 h-4 mr-1.5" /> Normal Event</>}
+    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 animated-fade">
+      {/* Event Hero */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-900/40 to-pink-900/40 border border-white/10 p-6 sm:p-10 mb-8">
+        <div className="relative z-10 flex flex-col items-center text-center space-y-4">
+          <div className="flex flex-wrap justify-center gap-2">
+            <span className={`text-[10px] py-0.5 px-2 rounded-full uppercase border font-medium ${
+              event.eventType === 'merchandise' 
+                ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
+                : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+            }`}>
+              {event.eventType === 'merchandise' ? 'Merchandise' : 'Standard Event'}
             </span>
-            {event.isTeamEvent && <span className="type-badge team flex items-center" style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}><Users className="w-4 h-4 mr-1.5" /> Team Event</span>}
-            <span className={`eligibility-badge`} style={{ fontSize: '1rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.2)', color: 'white' }}>{event.eligibility}</span>
+            {event.isTeamEvent && (
+              <span className="text-[10px] py-0.5 px-2 rounded-full uppercase border font-medium bg-blue-500/10 text-blue-400 border-blue-500/20">
+                Team Event
+              </span>
+            )}
+            <span className="text-[10px] py-0.5 px-2 rounded-full uppercase border font-medium bg-white/5 text-slate-300 border-white/10">
+              {event.eligibility === 'all' ? 'Open for all' : event.eligibility === 'iiit-only' ? 'IIIT Only' : 'Non-IIIT Only'}
+            </span>
           </div>
-          <h1 style={{ fontSize: '3.5rem', fontWeight: '800', textShadow: '0 4px 12px rgba(0,0,0,0.3)', marginBottom: '1rem' }}>{event.eventName}</h1>
-          <p className="organizer-name" style={{ fontSize: '1.2rem', opacity: 0.9 }}>by <strong>{event.organizer?.name}</strong></p>
+
+          <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">{event.eventName}</h1>
+          <p className="text-sm text-slate-400">Organized by <span className="text-white font-medium">{event.organizer?.name || 'Felicity'}</span></p>
           
-          <div className="event-date-info rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ display: 'inline-flex', marginTop: '2rem', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', padding: '1rem 2rem', borderRadius: '50px', gap: '2rem', border: '1px solid rgba(255,255,255,0.2)' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}> {new Date(event.eventStartDate).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
-            {event.registrationFee > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}> ₹{event.registrationFee}</span>}
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 pt-4 text-xs sm:text-sm text-slate-300">
+            <div className="bg-white/5 border border-white/5 rounded-full px-4 py-1.5">
+              {new Date(event.eventStartDate).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+            </div>
+            {event.registrationFee > 0 ? (
+              <div className="bg-white/5 border border-white/5 rounded-full px-4 py-1.5 font-semibold text-purple-400">
+                ₹{event.registrationFee}
+              </div>
+            ) : (
+              <div className="bg-white/5 border border-white/5 rounded-full px-4 py-1.5 font-semibold text-emerald-400">
+                Free Entry
+              </div>
+            )}
             {event.registrationLimit && (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}> {event.currentRegistrations}/{event.registrationLimit} slots</span>
+              <div className="bg-white/5 border border-white/5 rounded-full px-4 py-1.5">
+                {event.currentRegistrations} / {event.registrationLimit} Registered
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      <div className="event-tabs">
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-white/10 pb-3 mb-6 overflow-x-auto whitespace-nowrap scrollbar-none">
         {['info', 'register', 'forum', 'feedback'].map(tab => (
           <button
             key={tab}
-            className={`tab ${activeTab === tab ? 'active' : ''}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === tab 
+                ? 'bg-white text-black' 
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
             onClick={() => { setActiveTab(tab); if (tab === 'forum') setShowForum(true); }}
           >
-            {tab === 'info' ? <><Info className="w-4 h-4" /> Info</> : tab === 'register' ? <><Ticket className="w-4 h-4" /> Register</> : tab === 'forum' ? <><MessageCircle className="w-4 h-4" /> Forum</> : <><Star className="w-4 h-4" /> Feedback</>}
+            {tab === 'info' && <Info className="w-4 h-4" />}
+            {tab === 'register' && <Ticket className="w-4 h-4" />}
+            {tab === 'forum' && <MessageCircle className="w-4 h-4" />}
+            {tab === 'feedback' && <Star className="w-4 h-4" />}
+            <span className="capitalize">{tab}</span>
           </button>
         ))}
       </div>
 
-      <div className="event-content">
+      {/* Content Area */}
+      <div className="bg-[#09090b] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl">
         {activeTab === 'info' && (
-          <div className="event-info">
-            <div className="info-section">
-              <h3>About this Event</h3>
-              <p>{event.eventDescription}</p>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-2">About this Event</h3>
+              <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-line">{event.eventDescription}</p>
             </div>
-            <div className="info-grid">
-              <div className="info-item"><strong>Start:</strong> {new Date(event.eventStartDate).toLocaleString('en-IN')}</div>
-              <div className="info-item"><strong>End:</strong> {new Date(event.eventEndDate).toLocaleString('en-IN')}</div>
-              <div className="info-item"><strong>Registration Deadline:</strong> {new Date(event.registrationDeadline).toLocaleString('en-IN')}</div>
-              <div className="info-item"><strong>Fee:</strong> {event.registrationFee > 0 ? `₹${event.registrationFee}` : 'Free'}</div>
-              <div className="info-item"><strong>Eligibility:</strong> {event.eligibility}</div>
-              <div className="info-item"><strong>Type:</strong> {event.eventType}</div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/5">
+              <div className="space-y-1">
+                <span className="text-xs text-slate-500 uppercase font-medium">Starts</span>
+                <p className="text-sm text-white font-medium">{new Date(event.eventStartDate).toLocaleString()}</p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-xs text-slate-500 uppercase font-medium">Ends</span>
+                <p className="text-sm text-white font-medium">{new Date(event.eventEndDate).toLocaleString()}</p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-xs text-slate-500 uppercase font-medium">Registration Deadline</span>
+                <p className="text-sm text-white font-medium">{new Date(event.registrationDeadline).toLocaleString()}</p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-xs text-slate-500 uppercase font-medium">Eligibility</span>
+                <p className="text-sm text-white font-medium capitalize">{event.eligibility}</p>
+              </div>
             </div>
+
             {event.tags?.length > 0 && (
-              <div className="tags-section">
-                {event.tags.map(t => <span key={t} className="tag">#{t}</span>)}
+              <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
+                {event.tags.map(t => (
+                  <span key={t} className="text-xs text-slate-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                    #{t}
+                  </span>
+                ))}
               </div>
             )}
           </div>
         )}
 
         {activeTab === 'register' && (
-          <div className="register-section">
-            {success && <div className="alert alert-success">{success}</div>}
-            {error && <div className="alert alert-error">{error}</div>}
-
-            {ticket && (
-              <div className="ticket-display" style={{ background: 'linear-gradient(to right, #1a1a2e, #16213e)', borderRadius: '16px', padding: '2rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '100px', height: '100px', background: 'var(--primary)', filter: 'blur(50px)', opacity: 0.5 }}></div>
-                <h3 style={{ color: 'var(--primary)', marginBottom: '1.5rem', fontSize: '1.8rem' }}> Your VIP Ticket</h3>
-                <div className="ticket-rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', display: 'inline-block' }}>
-                  <QRCodeSVG value={ticket.ticketId} size={200} />
-                </div>
-                <p style={{ marginTop: '1.5rem', fontSize: '1.2rem', fontFamily: 'monospace', color: '#a78bfa', letterSpacing: '2px' }}>{ticket.ticketId}</p>
-                <p className="ticket-hint" style={{ color: '#9ca3af', marginTop: '0.5rem' }}>Show this QR at the event entrance</p>
+          <div className="space-y-6">
+            {success && (
+              <div className="alert alert-success bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-emerald-200 text-sm">
+                {success}
+              </div>
+            )}
+            {error && (
+              <div className="alert alert-error bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-200 text-sm">
+                {error}
               </div>
             )}
 
-            {isRegistered && !ticket && <div className="alert alert-success"> You are registered for this event.</div>}
+            {ticket && (
+              <div className="bg-white/[0.02] border border-white/10 rounded-xl p-6 text-center max-w-sm mx-auto shadow-md">
+                <h3 className="text-lg font-semibold text-white mb-4">Your Ticket</h3>
+                <div className="bg-white p-3 rounded-lg inline-block shadow-inner mb-4">
+                  <QRCodeSVG value={ticket.ticketId} size={180} />
+                </div>
+                <p className="text-sm font-mono text-purple-400 tracking-wider mb-1">{ticket.ticketId}</p>
+                <p className="text-xs text-slate-500">Present this QR code at the entrance</p>
+              </div>
+            )}
 
-            {!user && <div className="alert alert-info">Please <a href="/login">login</a> to register.</div>}
+            {isRegistered && !ticket && (
+              <div className="alert alert-success bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-emerald-200 text-sm">
+                You are registered for this event.
+              </div>
+            )}
 
-            {isDeadlinePassed && <div className="alert alert-error"><Clock className="w-5 h-5" /> Registration deadline has passed.</div>}
-            {isFull && <div className="alert alert-error"> Registration limit reached.</div>}
+            {!user && (
+              <div className="text-center py-6">
+                <p className="text-slate-400 text-sm">
+                  Please <a href="/login" className="text-white underline font-semibold">login</a> to register.
+                </p>
+              </div>
+            )}
+
+            {isDeadlinePassed && (
+              <div className="alert alert-error bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-200 text-sm">
+                Registration deadline has passed.
+              </div>
+            )}
+            
+            {isFull && (
+              <div className="alert alert-error bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-200 text-sm">
+                Registration limit reached.
+              </div>
+            )}
 
             {canRegister && (
-              <form onSubmit={handleSubmit(handleRegister)} className="registration-form rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                <h3 className="flex items-center gap-2 mb-6 text-xl font-semibold"><Ticket className="w-5 h-5" /> Registration Form</h3>
+              <form onSubmit={handleSubmit(handleRegister)} className="space-y-6 max-w-lg mx-auto">
+                <h3 className="text-lg font-semibold text-white mb-4">Registration Form</h3>
+                
                 {event.customForm?.length > 0 ? (
-                  event.customForm.map(field => (
-                    <div key={field.fieldName} className="form-group">
-                      <label>{field.label}{field.required && ' *'}</label>
-                      {field.fieldType === 'dropdown' ? (
-                        <select {...register(field.fieldName, { required: field.required })}>
-                          <option value="">Select...</option>
-                          {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
-                        </select>
-                      ) : field.fieldType === 'textarea' ? (
-                        <textarea rows={3} {...register(field.fieldName, { required: field.required })} />
-                      ) : (
-                        <input type={field.fieldType} {...register(field.fieldName, { required: field.required })} />
-                      )}
-                    </div>
-                  ))
+                  <div className="space-y-4">
+                    {event.customForm.map(field => (
+                      <div key={field.fieldName} className="form-group">
+                        <label className="block text-slate-300 text-sm font-medium mb-1.5">
+                          {field.label}{field.required && ' *'}
+                        </label>
+                        {field.fieldType === 'dropdown' ? (
+                          <select className="w-full" {...register(field.fieldName, { required: field.required })}>
+                            <option value="">Select...</option>
+                            {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        ) : field.fieldType === 'textarea' ? (
+                          <textarea className="w-full" rows={3} {...register(field.fieldName, { required: field.required })} />
+                        ) : (
+                          <input className="w-full" type={field.fieldType} {...register(field.fieldName, { required: field.required })} />
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  <p className="form-note">No additional information required. Click below to register.</p>
+                  <p className="text-sm text-slate-400 mb-4">No additional details needed. Press below to register.</p>
                 )}
-                <button type="submit" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2 btn-full" disabled={registering}>
-                  {registering ? <span className="spinner" /> : ' Register Now'}
+
+                <button 
+                  type="submit" 
+                  disabled={registering}
+                  className="w-full bg-white hover:bg-slate-200 text-black font-semibold py-2.5 px-4 rounded-xl text-sm transition-all"
+                >
+                  {registering ? 'Processing...' : 'Register Now'}
                 </button>
               </form>
             )}
@@ -208,56 +293,90 @@ const EventDetails = () => {
         )}
 
         {activeTab === 'forum' && (
-          <div className="forum-section">
-            <h3 className="flex items-center gap-2 mb-6 text-xl font-semibold"><MessageCircle className="w-5 h-5" /> Event Discussion</h3>
-            {!user && <div className="alert alert-info">Login and register to participate in the forum.</div>}
-            <div className="messages-list">
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-white">Event Discussion</h3>
+            {!user && <div className="alert alert-info bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl text-blue-200 text-sm">Login and register to participate in the forum.</div>}
+            
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
               {messages.map(msg => (
-                <div key={msg._id} className={`message ${msg.isAnnouncement ? 'announcement' : ''} ${msg.isPinned ? 'pinned' : ''}`}>
-                  {msg.isPinned && <span className="pin-badge flex items-center gap-1"><Pin className="w-3 h-3" /> Pinned</span>}
-                  {msg.isAnnouncement && <span className="announcement-badge flex items-center gap-1"><Megaphone className="w-3 h-3" /> Announcement</span>}
-                  <div className="message-header">
-                    <strong>{msg.author?.firstName || msg.author?.name}</strong>
-                    <span className="role-badge">{msg.author?.role}</span>
-                    <span className="msg-time">{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                <div 
+                  key={msg._id} 
+                  className={`p-4 rounded-xl border ${
+                    msg.isAnnouncement 
+                      ? 'bg-amber-500/5 border-amber-500/20' 
+                      : msg.isPinned 
+                      ? 'bg-purple-500/5 border-purple-500/20' 
+                      : 'bg-white/[0.02] border-white/5'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 text-xs mb-2">
+                    <span className="font-semibold text-white">{msg.author?.firstName || msg.author?.name}</span>
+                    <span className="text-[10px] py-0.5 px-2 bg-white/5 border border-white/10 rounded-full text-slate-400 font-medium capitalize">
+                      {msg.author?.role}
+                    </span>
+                    <span className="text-slate-500 ml-auto font-mono">
+                      {new Date(msg.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
-                  <p>{msg.content}</p>
-                  <div className="reactions mt-3 flex gap-2">
+                  <p className="text-sm text-slate-300">{msg.content}</p>
+                  
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
                     {[{id: 'like', icon: ThumbsUp}, {id: 'love', icon: Heart}, {id: 'party', icon: PartyPopper}, {id: 'rocket', icon: Rocket}].map(reaction => (
-                      <button key={reaction.id} className="reaction-btn flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-1 rounded-md text-xs border border-white/10" onClick={() => api.post(`/forum/message/${msg._id}/react`, { emoji: reaction.id })}>
-                        <reaction.icon className="w-4 h-4 text-slate-300" /> {msg.reactions?.filter(r => r.emoji === reaction.id).length || ''}
+                      <button 
+                        key={reaction.id} 
+                        onClick={() => api.post(`/forum/message/${msg._id}/react`, { emoji: reaction.id })}
+                        className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 hover:bg-white/10 px-2 py-1 rounded-md text-xs text-slate-400 hover:text-white transition-all"
+                      >
+                        <reaction.icon className="w-3 h-3" /> 
+                        <span className="text-[10px]">{msg.reactions?.filter(r => r.emoji === reaction.id).length || ''}</span>
                       </button>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
+
             {(isRegistered || user?.role === 'organizer') && (
-              <form className="message-form rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" onSubmit={sendMessage} style={{ padding: '1rem', borderRadius: '16px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <form onSubmit={sendMessage} className="flex gap-2 pt-4 border-t border-white/5">
                 <input
                   type="text"
-                  placeholder="Write a message..."
+                  placeholder="Type a message..."
                   value={msgText}
                   onChange={e => setMsgText(e.target.value)}
+                  className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-purple-500/50"
                 />
-                <button type="submit" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2">Send</button>
+                <button 
+                  type="submit" 
+                  className="bg-white hover:bg-slate-200 text-black font-semibold px-4 py-2 rounded-xl text-sm transition-all"
+                >
+                  Send
+                </button>
               </form>
             )}
           </div>
         )}
 
         {activeTab === 'feedback' && (
-          <div className="feedback-section">
-            <h3 className="flex items-center gap-2 mb-6 text-xl font-semibold"><Star className="w-5 h-5" /> Submit Anonymous Feedback</h3>
-            {success && <div className="alert alert-success">{success}</div>}
-            {error && <div className="alert alert-error">{error}</div>}
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-white">Submit Feedback</h3>
+            {success && (
+              <div className="alert alert-success bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-emerald-200 text-sm">
+                {success}
+              </div>
+            )}
+            {error && (
+              <div className="alert alert-error bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-200 text-sm">
+                {error}
+              </div>
+            )}
+            
             {isRegistered ? (
-              <form onSubmit={handleSubmit(submitFeedback)} className="feedback-form rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6" style={{ padding: '3rem', borderRadius: '24px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)', marginTop: '2rem' }}>
+              <form onSubmit={handleSubmit(submitFeedback)} className="space-y-5 max-w-lg mx-auto">
                 <div className="form-group">
-                  <label>Rating (1-5 stars)</label>
-                  <div className="star-selector flex gap-2 mt-2">
+                  <label className="block text-slate-300 text-sm font-medium mb-1.5">Rating (1-5 stars)</label>
+                  <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map(n => (
-                      <label key={n} className="star-option cursor-pointer flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-colors">
+                      <label key={n} className="cursor-pointer p-1 rounded hover:bg-white/5 transition-colors">
                         <input type="radio" className="hidden" value={n} {...register('rating', { required: true })} />
                         <Star className="w-6 h-6 text-yellow-500" />
                       </label>
@@ -265,13 +384,25 @@ const EventDetails = () => {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Comment (optional)</label>
-                  <textarea rows={3} placeholder="Share your thoughts..." {...register('comment')} />
+                  <label className="block text-slate-300 text-sm font-medium mb-1.5">Comment</label>
+                  <textarea 
+                    rows={3} 
+                    placeholder="Share your thoughts anonymously..." 
+                    {...register('comment')} 
+                    className="w-full"
+                  />
                 </div>
-                <button type="submit" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2">Submit Anonymously</button>
+                <button 
+                  type="submit" 
+                  className="w-full bg-white hover:bg-slate-200 text-black font-semibold py-2.5 px-4 rounded-xl text-sm transition-all"
+                >
+                  Submit Anonymously
+                </button>
               </form>
             ) : (
-              <p className="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-800 p-8 text-center animate-in fade-in-50">You must be registered for this event to submit feedback.</p>
+              <div className="text-center py-8 border border-dashed border-white/10 rounded-xl bg-white/[0.01]">
+                <p className="text-slate-400 text-sm">You must be registered for this event to submit feedback.</p>
+              </div>
             )}
           </div>
         )}

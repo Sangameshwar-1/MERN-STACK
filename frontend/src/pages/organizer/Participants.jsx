@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import QRScanner from '../../components/QRScanner';
+import { ArrowLeft, Download, QrCode } from 'lucide-react';
 
 const Participants = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [registrations, setRegistrations] = useState([]);
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,13 +26,12 @@ const Participants = () => {
   const handleScan = async (ticketId) => {
     try {
       const res = await api.post('/registrations/attendance', { ticketId });
-      // Update local state
       setRegistrations(regs => regs.map(r => 
         r.participant._id === res.data.participant._id 
           ? { ...r, attendanceMarked: true, attendanceTimestamp: res.data.timestamp }
           : r
       ));
-      alert(` Attendance marked for ${res.data.participant.firstName}`);
+      alert(`Attendance marked for ${res.data.participant.firstName}`);
     } catch {
       alert('Invalid ticket');
     }
@@ -51,71 +52,127 @@ const Participants = () => {
     }
   };
 
-  if (loading) return <div className="loading-spinner large" />;
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] w-full items-center justify-center">
+        <div className="loading-spinner w-10 h-10 border-2" />
+      </div>
+    );
+  }
 
   const presentCount = registrations.filter(r => r.attendanceMarked).length;
 
   return (
-    <div className="participants-page section">
-      <div className="flex-between">
+    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 animated-fade">
+      {/* Navigation */}
+      <button 
+        onClick={() => navigate('/organizer/events')} 
+        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-8"
+      >
+        <ArrowLeft className="w-4 h-4" /> 
+        Back to events
+      </button>
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-8 border-b border-white/10">
         <div>
-          <h1> Participants</h1>
-          <p>Manage registrations for {event?.eventName}</p>
+          <h1 className="text-2xl font-semibold text-white tracking-tight">Attendees</h1>
+          <p className="text-sm text-slate-400 mt-1">Manage registrations for {event?.eventName}</p>
         </div>
-        <div className="actions">
-          <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-800 text-zinc-50 hover:bg-zinc-800/80 h-9 px-4 py-2" onClick={downloadCSV}>⬇️ Export CSV</button>
-          <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200/90 h-9 px-4 py-2" onClick={() => setShowScanner(!showScanner)}>
-            {showScanner ? 'Close Scanner' : ' Scan QR Codes'}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button 
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-all" 
+            onClick={downloadCSV}
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+          <button 
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 bg-white text-black hover:bg-slate-200 text-sm font-semibold py-2.5 px-4 rounded-xl transition-all" 
+            onClick={() => setShowScanner(!showScanner)}
+          >
+            <QrCode className="w-4 h-4" />
+            {showScanner ? 'Close Scanner' : 'Scan QR'}
           </button>
         </div>
       </div>
 
-      <div className="stats-row">
-        <div className="stat-pill">Total Registered: <strong>{registrations.length}</strong></div>
-        <div className="stat-pill">Present: <strong>{presentCount}</strong></div>
-        <div className="stat-pill">Absent: <strong>{registrations.length - presentCount}</strong></div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="bg-white/[0.02] border border-white/10 rounded-xl p-4 text-center">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider">Registered</div>
+          <div className="text-2xl font-semibold text-white mt-1">{registrations.length}</div>
+        </div>
+        <div className="bg-white/[0.02] border border-white/10 rounded-xl p-4 text-center">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider text-emerald-400">Present</div>
+          <div className="text-2xl font-semibold text-white mt-1">{presentCount}</div>
+        </div>
+        <div className="bg-white/[0.02] border border-white/10 rounded-xl p-4 text-center">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider text-red-400">Absent</div>
+          <div className="text-2xl font-semibold text-white mt-1">{registrations.length - presentCount}</div>
+        </div>
       </div>
 
+      {/* Scanner Panel */}
       {showScanner && (
-        <div className="scanner-container rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow p-6">
+        <div className="mb-8 rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl p-6">
           <QRScanner onScanSuccess={handleScan} />
         </div>
       )}
 
-      <div className="w-full overflow-auto rounded-md border border-zinc-800">
-        <table className="w-full caption-bottom text-sm">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Attendance</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {registrations.map(reg => (
-              <tr key={reg._id}>
-                <td>{reg.participant.firstName} {reg.participant.lastName}</td>
-                <td>{reg.participant.email}</td>
-                <td><span className={`type-badge sm ${reg.participant.participantType}`}>{reg.participant.participantType}</span></td>
-                <td><span className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 border-transparent bg-zinc-100 text-zinc-900 shadow hover:bg-zinc-100/80 sm ${reg.status}`}>{reg.status}</span></td>
-                <td>
-                  <span className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 border-transparent bg-zinc-100 text-zinc-900 shadow hover:bg-zinc-100/80 sm ${reg.attendanceMarked ? 'confirmed' : 'pending'}`}>
-                    {reg.attendanceMarked ? 'Present' : 'Absent'}
-                  </span>
-                </td>
-                <td className="text-sm">
-                  {reg.attendanceTimestamp ? new Date(reg.attendanceTimestamp).toLocaleTimeString() : '-'}
-                </td>
-              </tr>
-            ))}
-            {registrations.length === 0 && (
-              <tr><td colSpan="6" className="text-center">No participants registered yet.</td></tr>
-            )}
-          </tbody>
-        </table>
+      {/* Attendees List */}
+      <div className="space-y-4">
+        {registrations.map(reg => (
+          <div 
+            key={reg._id} 
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-white/[0.02] border border-white/10 rounded-xl hover:bg-white/[0.03] transition-all"
+          >
+            <div className="space-y-2">
+              <div>
+                <h3 className="font-semibold text-white text-base">
+                  {reg.participant.firstName} {reg.participant.lastName}
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">{reg.participant.email}</p>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`text-[10px] py-0.5 px-2 rounded-full uppercase border font-medium ${
+                  reg.participant.participantType === 'iiit' 
+                    ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' 
+                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+                }`}>
+                  {reg.participant.participantType}
+                </span>
+                <span className={`text-[10px] py-0.5 px-2 rounded-full uppercase border font-medium ${
+                  reg.status === 'confirmed' 
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                    : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                }`}>
+                  {reg.status}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-row sm:flex-col sm:items-end justify-between items-center gap-2 border-t border-white/5 pt-3 sm:border-0 sm:pt-0">
+              <span className={`text-xs py-1 px-3 rounded-full font-medium ${
+                reg.attendanceMarked 
+                  ? 'bg-emerald-500/15 text-emerald-400' 
+                  : 'bg-red-500/15 text-red-400'
+              }`}>
+                {reg.attendanceMarked ? 'Present' : 'Absent'}
+              </span>
+              {reg.attendanceTimestamp && (
+                <span className="text-xs text-slate-500 font-mono">
+                  Checked in: {new Date(reg.attendanceTimestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+        {registrations.length === 0 && (
+          <div className="text-center py-12 border border-dashed border-white/10 rounded-xl bg-white/[0.01]">
+            <p className="text-slate-400 text-sm">No participants registered yet.</p>
+          </div>
+        )}
       </div>
     </div>
   );

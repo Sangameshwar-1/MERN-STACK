@@ -30,6 +30,16 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const logoutFromAll = async () => {
+    try {
+      await api.post('/auth/logout-all');
+    } catch (err) {
+      console.error('Revoke all devices failed:', err);
+    } finally {
+      logout();
+    }
+  };
+
   const updateUser = (updates) => {
     const updated = { ...user, ...updates };
     localStorage.setItem('felicity_user', JSON.stringify(updated));
@@ -37,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, login, register, logout, logoutFromAll, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

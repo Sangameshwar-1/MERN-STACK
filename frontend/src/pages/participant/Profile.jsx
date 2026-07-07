@@ -13,7 +13,7 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  const { user } = useAuth();
+  const { user, logout, logoutFromAll } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -168,12 +168,26 @@ const Profile = () => {
         </Card>
       </div>
 
-      <div className="text-center mt-12">
+      <div className="flex flex-col gap-4 max-w-sm mx-auto mt-12 text-center">
         <Link to="/change-password">
-          <Button variant="outline" className="flex items-center gap-2 mx-auto">
+          <Button variant="outline" className="w-full flex items-center justify-center gap-2">
             <Lock className="w-4 h-4" /> Change My Password
           </Button>
         </Link>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+          <button 
+            onClick={logout}
+            className="w-full flex items-center justify-center py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 bg-white/5 border border-white/10 text-white hover:bg-white/10"
+          >
+            Logout
+          </button>
+          <button 
+            onClick={logoutFromAll}
+            className="w-full flex items-center justify-center py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20"
+          >
+            Logout from All Devices
+          </button>
+        </div>
       </div>
     </div>
   );
