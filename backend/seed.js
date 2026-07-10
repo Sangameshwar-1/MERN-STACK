@@ -37,7 +37,7 @@ const seedDatabase = async () => {
       const org = new User({
         name: club.name,
         email: `${club.name.toLowerCase().replace(/\s+/g, '')}@iiit.ac.in`,
-        password: 'password123',
+        password: '12345678',
         role: 'organizer',
         category: club.category,
         description: `Official ${club.name} of IIITH.`,
@@ -63,7 +63,7 @@ const seedDatabase = async () => {
         firstName: fn,
         lastName: ln,
         email,
-        password: 'password123',
+        password: '12345678',
         role: 'participant',
         participantType: type,
         collegeOrOrg: type === 'iiit' ? 'IIIT Hyderabad' : 'NIT Warangal',
@@ -125,7 +125,7 @@ const seedDatabase = async () => {
       firstName: 'Admin',
       lastName: 'Felicity',
       email: 'admin@felicity.com',
-      password: 'Admin@123',
+      password: '12345678',
       role: 'admin',
       participantType: 'iiit',
       contactNumber: '9999999999',
@@ -140,13 +140,13 @@ const seedDatabase = async () => {
     console.log('\n🔐 IMPORTANT LOGIN CREDENTIALS 🔐\n');
     console.log('--- ADMIN ACCOUNT ---');
     console.log('Email: admin@felicity.com');
-    console.log('Password: Admin@123');
+    console.log('Password: 12345678');
     console.log('\n--- FELICITY CORE TEAM (ORGANIZER) ---');
     console.log('Email: felicitycoreteam@iiit.ac.in');
-    console.log('Password: password123');
+    console.log('Password: 12345678');
     console.log('\n--- SAMPLE PARTICIPANT ---');
     console.log(`Email: ${savedParticipants[0].email}`);
-    console.log('Password: password123');
+    console.log('Password: 12345678');
     console.log('=============================================\n');
 
     process.exit(0);
