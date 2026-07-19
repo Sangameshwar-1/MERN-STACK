@@ -1,4 +1,22 @@
 services:
+  # 1. Frontend (Static Site)
+  - type: web
+    name: felicity-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://felicity-backend.onrender.com/api
+      - key: VITE_SOCKET_URL
+        value: https://felicity-backend.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # 2. Backend (Node.js API)
   - type: web
     name: felicity-backend
     env: node
@@ -11,10 +29,22 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        sync: false
+        value: mongodb+srv://salesangameshwar1_db_user:felicity@123@cluster0.tf9t0ts.mongodb.net/felicity?retryWrites=true&w=majority
       - key: JWT_SECRET
         generateValue: true
+      - key: CLIENT_URL
+        value: https://felicity-frontend.onrender.com
       - key: CACHEX_HOST
         value: cachex-engine
       - key: CACHEX_PORT
+        value: 6379
+
+  # 3. CacheX Engine (C++ TCP Server)
+  - type: pserv
+    name: cachex-engine
+    env: docker
+    rootDir: cachex
+    dockerfilePath: docker/Dockerfile
+    envVars:
+      - key: PORT
         value: 6379
