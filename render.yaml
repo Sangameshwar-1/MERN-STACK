@@ -27,8 +27,6 @@ services:
     name: cachex-engine
     env: docker
     rootDir: cachex
-    dockerfilePath: ./cachex/docker/Dockerfile
-    dockerContext: ./cachex
     envVars:
       - key: PORT
         value: 6379
