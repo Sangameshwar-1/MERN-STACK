@@ -1,3 +1,11 @@
+// Fallback Environment Variables for Render Manual Deployments
+process.env.MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI || "mongodb+srv://salesangameshwar1_db_user:felicity@123@cluster0.tf9t0ts.mongodb.net/felicity?retryWrites=true&w=majority";
+process.env.MONGO_URI = process.env.MONGODB_URI;
+process.env.JWT_SECRET = process.env.JWT_SECRET || "felicity_super_secret_jwt_key_2024_fallback";
+process.env.CACHEX_HOST = process.env.CACHEX_HOST || "127.0.0.1";
+process.env.CACHEX_PORT = process.env.CACHEX_PORT || "6379";
+process.env.CLIENT_URL = process.env.CLIENT_URL || "https://felicity-iiit.vercel.app";
+
 const express = require('express');
 const http = require('http');
 const path = require('path');
