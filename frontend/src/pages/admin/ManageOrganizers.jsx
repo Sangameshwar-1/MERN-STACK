@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import api from '../../utils/api';
 
 const ManageOrganizers = () => {
+  const SERVER_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
   const [organizers, setOrganizers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -130,7 +131,7 @@ const ManageOrganizers = () => {
               <tr key={org._id}>
                 <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   {org.clubLogoUrl ? (
-                    <img src={`http://localhost:5000${org.clubLogoUrl}`} alt="logo" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }} />
+                    <img src={`${SERVER_URL}${org.clubLogoUrl}`} alt="logo" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }} />
                   ) : (
                     <span style={{ fontSize: '1.5rem' }}></span>
                   )}

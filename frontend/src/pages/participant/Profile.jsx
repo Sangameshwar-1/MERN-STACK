@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/Button';
 import { User, Edit2, Lock, Camera } from 'lucide-react';
 
 const Profile = () => {
+  const SERVER_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,7 +39,7 @@ const Profile = () => {
     };
   }, []);
 
-  const profilePic = profile?.profilePictureUrl ? `http://localhost:5000${profile.profilePictureUrl}` : null;
+  const profilePic = profile?.profilePictureUrl ? `${SERVER_URL}${profile.profilePictureUrl}` : null;
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];

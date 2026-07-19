@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 
 const ClubsDirectory = () => {
+  const SERVER_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
   const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -103,7 +104,7 @@ const ClubsDirectory = () => {
                 <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden mb-4 shadow-sm">
                   {club.clubLogoUrl ? (
                     <img 
-                      src={club.clubLogoUrl.startsWith('http') ? club.clubLogoUrl : `http://localhost:5000${club.clubLogoUrl}`} 
+                      src={club.clubLogoUrl.startsWith('http') ? club.clubLogoUrl : `${SERVER_URL}${club.clubLogoUrl}`} 
                       alt={club.name} 
                       className="w-full h-full object-cover"
                     />
