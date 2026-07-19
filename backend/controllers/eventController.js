@@ -1,6 +1,7 @@
 const Event = require('../models/Event');
 const Registration = require('../models/Registration');
 const User = require('../models/User');
+const cachex = require('../utils/cachex');
 
 // @desc    Create a new event
 // @route   POST /api/events
@@ -8,6 +9,9 @@ const User = require('../models/User');
 const createEvent = async (req, res) => {
   try {
     const event = await Event.create({ ...req.body, organizer: req.user._id });
+    
+    // Invalidate CacheX
+    await cachex.clear();
 
     // Post to Discord webhook if configured
     const organizer = await User.findById(req.user._id);
@@ -39,6 +43,15 @@ const getEvents = async (req, res) => {
   try {
     const { search, eventType, eligibility, startDate, endDate, followedClubs, page = 1, limit = 12 } = req.query;
     
+    // CacheX Check
+    const cacheKey = `events_${page}_${limit}_${search||''}_${eventType||''}_${eligibility||''}_${startDate||''}_${endDate||''}_${followedClubs||''}`;
+    const cachedData = await cachex.getJSON(cacheKey);
+    if (cachedData) {
+      console.log('[CacheX] HIT:', cacheKey);
+      return res.json(cachedData);
+    }
+    console.log('[CacheX] MISS:', cacheKey);
+
     let query = { isActive: true };
 
     // Text search
@@ -72,7 +85,12 @@ const getEvents = async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit));
 
-    res.json({ events, total, page: parseInt(page), pages: Math.ceil(total / limit) });
+    const responseData = { events, total, page: parseInt(page), pages: Math.ceil(total / limit) };
+    
+    // Save to CacheX (TTL: 60s)
+    await cachex.set(cacheKey, responseData, 60);
+
+    res.json(responseData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -83,11 +101,21 @@ const getEvents = async (req, res) => {
 // @access  Public
 const getTrendingEvents = async (req, res) => {
   try {
+    const cacheKey = 'trending_events';
+    const cachedData = await cachex.getJSON(cacheKey);
+    if (cachedData) {
+      console.log('[CacheX] HIT:', cacheKey);
+      return res.json(cachedData);
+    }
+    console.log('[CacheX] MISS:', cacheKey);
+
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const trending = await Event.find({ isActive: true, updatedAt: { $gte: oneDayAgo } })
       .populate('organizer', 'name category')
       .sort({ viewCount: -1 })
       .limit(5);
+      
+    await cachex.set(cacheKey, trending, 120); // Cache for 2 mins
     res.json(trending);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -99,6 +127,18 @@ const getTrendingEvents = async (req, res) => {
 // @access  Public
 const getEventById = async (req, res) => {
   try {
+    const cacheKey = `event_${req.params.id}`;
+    const cachedData = await cachex.getJSON(cacheKey);
+    if (cachedData) {
+      console.log('[CacheX] HIT:', cacheKey);
+      
+      // Still need to update view count in bg
+      Event.findByIdAndUpdate(req.params.id, { $inc: { viewCount: 1 } }).exec();
+      
+      return res.json(cachedData);
+    }
+    console.log('[CacheX] MISS:', cacheKey);
+
     const event = await Event.findById(req.params.id)
       .populate('organizer', 'name category description contactEmail');
 
@@ -108,6 +148,7 @@ const getEventById = async (req, res) => {
     event.viewCount += 1;
     await event.save();
 
+    await cachex.set(cacheKey, event, 300); // 5 mins
     res.json(event);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -131,6 +172,12 @@ const updateEvent = async (req, res) => {
     }
 
     const updated = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    
+    // Invalidate caches
+    await cachex.del(`event_${req.params.id}`);
+    await cachex.del('trending_events');
+    await cachex.clear(); // Safest approach for pagination cache
+
     res.json(updated);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -148,6 +195,11 @@ const deleteEvent = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
     await event.deleteOne();
+    
+    // Invalidate caches
+    await cachex.del(`event_${req.params.id}`);
+    await cachex.clear();
+
     res.json({ message: 'Event deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

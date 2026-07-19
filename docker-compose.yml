@@ -9,6 +9,13 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  cachex:
+    image: cachex:latest
+    container_name: mern_cachex
+    ports:
+      - "6379:6379"
+    command: ["./cachex", "--server"]
+
   backend:
     build:
       context: ./backend
@@ -25,8 +32,10 @@ services:
       - ADMIN_EMAIL=admin@felicity.com
       - ADMIN_PASSWORD=Admin@123
       - CLIENT_URL=http://localhost:5173
+      - CACHEX_HOST=cachex
     depends_on:
       - mongodb
+      - cachex
 
   frontend:
     build:
