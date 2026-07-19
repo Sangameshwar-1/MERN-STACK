@@ -9,8 +9,17 @@ const BrowseEvents = () => {
   const [trending, setTrending] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filters, setFilters] = useState({ eventType: '', eligibility: '', followedClubs: false });
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     let active = true;
@@ -19,7 +28,7 @@ const BrowseEvents = () => {
       setLoading(true);
       try {
         const params = new URLSearchParams({ page: 1, limit: 12 });
-        if (search) params.append('search', search);
+        if (debouncedSearch) params.append('search', debouncedSearch);
         if (filters.eventType) params.append('eventType', filters.eventType);
         if (filters.eligibility) params.append('eligibility', filters.eligibility);
         if (filters.followedClubs) params.append('followedClubs', 'true');
@@ -41,13 +50,13 @@ const BrowseEvents = () => {
     return () => {
       active = false;
     };
-  }, [search, filters]);
+  }, [debouncedSearch, filters]);
 
   const fetchEvents = async (page = 1) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page, limit: 12 });
-      if (search) params.append('search', search);
+      if (debouncedSearch) params.append('search', debouncedSearch);
       if (filters.eventType) params.append('eventType', filters.eventType);
       if (filters.eligibility) params.append('eligibility', filters.eligibility);
       if (filters.followedClubs) params.append('followedClubs', 'true');
@@ -149,7 +158,7 @@ const BrowseEvents = () => {
         {!loading && <span>{pagination.total} events matching filters</span>}
       </div>
 
-      {loading ? (
+      {loading && events.length === 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="h-64 bg-white/[0.02] border border-white/5 rounded-2xl animate-pulse" />
@@ -157,7 +166,7 @@ const BrowseEvents = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-200 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             {events.map(event => <EventCard key={event._id} event={event} />)}
           </div>
           
