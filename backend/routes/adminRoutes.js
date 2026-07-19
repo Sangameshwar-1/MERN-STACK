@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const {
   createOrganizer, getAllOrganizers, toggleOrganizerStatus,
-  deleteOrganizer, getPasswordResetRequests, handlePasswordResetRequest, getAdminStats
+  deleteOrganizer, getPasswordResetRequests, handlePasswordResetRequest, getAdminStats, seedDatabase
 } = require('../controllers/adminController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
+
+router.get('/seed-fake-data', seedDatabase);
 
 router.use(protect, authorizeRoles('admin'));
 

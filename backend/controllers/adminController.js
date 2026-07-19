@@ -218,4 +218,71 @@ const getAdminStats = async (req, res) => {
   }
 };
 
-module.exports = { createOrganizer, getAllOrganizers, toggleOrganizerStatus, deleteOrganizer, getPasswordResetRequests, handlePasswordResetRequest, getAdminStats };
+const seedDatabase = async (req, res) => {
+  try {
+    const Event = require('../models/Event');
+    
+    const EVENT_NAMES = [
+      "CodeSprint 2026", "RoboWars", "Hackathon Alpha", "Music Fest '26", 
+      "AI Symposium", "Gaming Tournament", "WebDev Bootcamp", "StartUp Pitch", 
+      "Photography Contest", "Dance Battle", "Literature Fest", "Debate Championship",
+      "Designathon", "Treasure Hunt", "VR Experience", "CyberSecurity Workshop"
+    ];
+
+    const IMAGES = [
+      "https://images.unsplash.com/photo-1540575467063-178a50c2df87",
+      "https://images.unsplash.com/photo-1515187029135-18ee286d815b",
+      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+      "https://images.unsplash.com/photo-1505373877841-8d25f7d46678",
+      "https://images.unsplash.com/photo-1511512578047-dfb367046420"
+    ];
+
+    await Event.deleteMany({});
+    await User.deleteMany({ role: 'organizer' });
+
+    const organizers = [];
+    for(let i = 1; i <= 5; i++) {
+      const org = await User.create({
+        name: `Tech Club ${i}`,
+        email: `techclub${i}@felicity.com`,
+        password: 'password123',
+        role: 'organizer',
+        isActive: true,
+        onboardingComplete: true
+      });
+      organizers.push(org);
+    }
+
+    for (let i = 0; i < 50; i++) {
+      const org = organizers[Math.floor(Math.random() * organizers.length)];
+      const now = new Date();
+      const start = new Date(now.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000); 
+      const end = new Date(start.getTime() + Math.random() * 3 * 24 * 60 * 60 * 1000); 
+      const deadline = new Date(start.getTime() - 2 * 24 * 60 * 60 * 1000); 
+      const img = IMAGES[Math.floor(Math.random() * IMAGES.length)];
+      
+      await Event.create({
+        eventName: `${EVENT_NAMES[Math.floor(Math.random() * EVENT_NAMES.length)]} - Edition ${i+1}`,
+        eventDescription: `This is a massively scaled, automatically generated event with tons of amazing activities, prizes, and fun! Join us for edition ${i+1}.`,
+        eventType: Math.random() > 0.8 ? 'merchandise' : 'normal',
+        eligibility: ['all', 'iiit-only', 'non-iiit-only'][Math.floor(Math.random() * 3)],
+        eventStartDate: start,
+        eventEndDate: end,
+        registrationDeadline: deadline,
+        registrationFee: Math.floor(Math.random() * 5) * 100,
+        organizer: org._id,
+        posterUrl: img,
+        bannerUrl: img,
+        tags: ["tech", "fun", "college"],
+        viewCount: Math.floor(Math.random() * 1000)
+      });
+    }
+
+    await cachex.clear();
+    res.json({ message: 'Successfully seeded 50 events!' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { createOrganizer, getAllOrganizers, toggleOrganizerStatus, deleteOrganizer, getPasswordResetRequests, handlePasswordResetRequest, getAdminStats, seedDatabase };
