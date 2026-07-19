@@ -1,11 +1,9 @@
 services:
-  # 1. Backend (Node.js API)
+  # 1. Monolithic Web Service (Node API + CacheX)
   - type: web
     name: felicity-backend
-    env: node
-    rootDir: backend
-    buildCommand: npm install
-    startCommand: node server.js
+    env: docker
+    rootDir: .
     envVars:
       - key: PORT
         value: 5000
@@ -18,15 +16,6 @@ services:
       - key: CLIENT_URL
         value: https://felicity-iiit.vercel.app # Replace with your actual Vercel URL
       - key: CACHEX_HOST
-        value: cachex-engine
+        value: 127.0.0.1
       - key: CACHEX_PORT
-        value: 6379
-
-  # 2. CacheX Engine (C++ TCP Server)
-  - type: pserv
-    name: cachex-engine
-    env: docker
-    rootDir: .
-    envVars:
-      - key: PORT
         value: 6379
