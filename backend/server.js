@@ -1,5 +1,5 @@
 // Fallback Environment Variables for Render Manual Deployments
-process.env.MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI || "mongodb+srv://salesangameshwar1_db_user:felicity@123@cluster0.tf9t0ts.mongodb.net/felicity?retryWrites=true&w=majority";
+process.env.MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI || "mongodb+srv://salesangameshwar1_db_user:felicity%40123@cluster0.tf9t0ts.mongodb.net/felicity?retryWrites=true&w=majority";
 process.env.MONGO_URI = process.env.MONGODB_URI;
 process.env.JWT_SECRET = process.env.JWT_SECRET || "felicity_super_secret_jwt_key_2024_fallback";
 process.env.CACHEX_HOST = process.env.CACHEX_HOST || "127.0.0.1";
