@@ -5,6 +5,7 @@ const User = require('../models/User');
 const { generateQRCode } = require('../utils/qrGenerator');
 const { sendTicketEmail } = require('../utils/emailService');
 const { v4: uuidv4 } = require('uuid');
+const cachex = require('../utils/cachex');
 
 // @desc    Register for a normal event
 // @route   POST /api/registrations/register
@@ -88,6 +89,10 @@ const registerForEvent = async (req, res) => {
     } catch (emailError) {
       console.error('Email sending failed:', emailError.message);
     }
+    
+    await cachex.del(`my_registrations_${req.user._id}`);
+    await cachex.del(`event_registrations_${eventId}`);
+    await cachex.del(`participant_dash_${req.user._id}`);
 
     res.status(201).json({
       message: 'Registration successful! Ticket sent to your email.',
@@ -107,6 +112,10 @@ const registerForEvent = async (req, res) => {
 // @access  Private (participant)
 const getMyRegistrations = async (req, res) => {
   try {
+    const cacheKey = `my_registrations_${req.user._id}`;
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const registrations = await Registration.find({ participant: req.user._id })
       .populate({
         path: 'event',
@@ -119,7 +128,8 @@ const getMyRegistrations = async (req, res) => {
       const ticket = await Ticket.findOne({ registration: reg._id });
       return { ...reg.toObject(), ticket };
     }));
-
+    
+    await cachex.set(cacheKey, withTickets, 120);
     res.json(withTickets);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -153,6 +163,10 @@ const getTicketById = async (req, res) => {
 // @access  Private (organizer)
 const getEventRegistrations = async (req, res) => {
   try {
+    const cacheKey = `event_registrations_${req.params.eventId}`;
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const event = await Event.findById(req.params.eventId);
     if (!event) return res.status(404).json({ message: 'Event not found' });
     if (event.organizer.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
@@ -162,6 +176,7 @@ const getEventRegistrations = async (req, res) => {
     const registrations = await Registration.find({ event: req.params.eventId })
       .populate('participant', 'firstName lastName email contactNumber participantType collegeOrOrg');
 
+    await cachex.set(cacheKey, registrations, 60);
     res.json(registrations);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -193,6 +208,10 @@ const markAttendance = async (req, res) => {
     registration.attendanceMarked = true;
     registration.attendanceTimestamp = new Date();
     await registration.save();
+    
+    await cachex.del(`my_registrations_${registration.participant._id}`);
+    await cachex.del(`event_registrations_${ticket.event._id}`);
+    await cachex.del(`participant_dash_${registration.participant._id}`);
 
     res.json({
       message: 'Attendance marked successfully',

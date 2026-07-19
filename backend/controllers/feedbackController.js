@@ -1,5 +1,6 @@
 const Feedback = require('../models/Feedback');
 const Registration = require('../models/Registration');
+const cachex = require('../utils/cachex');
 
 // @desc    Submit anonymous feedback
 // @route   POST /api/feedback/:eventId
@@ -28,6 +29,8 @@ const submitFeedback = async (req, res) => {
       rating,
       comment
     });
+    
+    await cachex.del(`feedback_${req.params.eventId}`);
 
     res.status(201).json({ message: 'Feedback submitted anonymously. Thank you!', feedback });
   } catch (error) {
@@ -40,6 +43,10 @@ const submitFeedback = async (req, res) => {
 // @access  Private (organizer/admin)
 const getEventFeedback = async (req, res) => {
   try {
+    const cacheKey = `feedback_${req.params.eventId}`;
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const feedbacks = await Feedback.find({ event: req.params.eventId }).sort({ createdAt: -1 });
 
     const totalRatings = feedbacks.length;
@@ -50,12 +57,15 @@ const getEventFeedback = async (req, res) => {
     const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     feedbacks.forEach(f => ratingDistribution[f.rating]++);
 
-    res.json({
+    const responseData = {
       totalRatings,
       averageRating: parseFloat(averageRating),
       ratingDistribution,
       feedbacks: feedbacks.map(f => ({ rating: f.rating, comment: f.comment, createdAt: f.createdAt }))
-    });
+    };
+    
+    await cachex.set(cacheKey, responseData, 60);
+    res.json(responseData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

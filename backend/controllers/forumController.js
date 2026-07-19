@@ -1,11 +1,16 @@
 const ForumMessage = require('../models/ForumMessage');
 const Registration = require('../models/Registration');
+const cachex = require('../utils/cachex');
 
 // @desc    Get forum messages for an event
 // @route   GET /api/forum/:eventId
 // @access  Private
 const getMessages = async (req, res) => {
   try {
+    const cacheKey = `forum_${req.params.eventId}`;
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const messages = await ForumMessage.find({
       event: req.params.eventId,
       isDeleted: false,
@@ -23,6 +28,7 @@ const getMessages = async (req, res) => {
       return { ...msg.toObject(), replies };
     }));
 
+    await cachex.set(cacheKey, withReplies, 30); // 30s TTL
     res.json(withReplies);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -56,6 +62,8 @@ const postMessage = async (req, res) => {
 
     // Emit via socket.io (handled in server.js)
     req.io.to(req.params.eventId).emit('new-message', populated);
+    
+    await cachex.del(`forum_${req.params.eventId}`);
 
     res.status(201).json(populated);
   } catch (error) {
@@ -79,6 +87,9 @@ const deleteMessage = async (req, res) => {
     message.isDeleted = true;
     await message.save();
     req.io.to(message.event.toString()).emit('message-deleted', message._id);
+    
+    await cachex.del(`forum_${message.event}`);
+    
     res.json({ message: 'Message deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -95,6 +106,9 @@ const togglePin = async (req, res) => {
 
     message.isPinned = !message.isPinned;
     await message.save();
+    
+    await cachex.del(`forum_${message.event}`);
+    
     res.json({ message: `Message ${message.isPinned ? 'pinned' : 'unpinned'}`, isPinned: message.isPinned });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -118,6 +132,9 @@ const reactToMessage = async (req, res) => {
       message.reactions.push({ user: req.user._id, emoji });
     }
     await message.save();
+    
+    await cachex.del(`forum_${message.event}`);
+    
     res.json(message.reactions);
   } catch (error) {
     res.status(500).json({ message: error.message });

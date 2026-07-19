@@ -2,6 +2,7 @@ const User = require('../models/User');
 const { generatePassword } = require('../utils/generatePassword');
 const { sendOrganizerCredentials, sendPasswordResetEmail } = require('../utils/emailService');
 const PasswordResetRequest = require('../models/PasswordResetRequest');
+const cachex = require('../utils/cachex');
 
 // @desc    Create organizer account (admin only)
 // @route   POST /api/admin/organizers
@@ -41,6 +42,10 @@ const createOrganizer = async (req, res) => {
     } catch (e) {
       console.error('Email error:', e.message);
     }
+    
+    // Invalidate caches
+    await cachex.del('admin_organizers');
+    await cachex.del('admin_stats');
 
     res.status(201).json({
       message: 'Organizer created successfully. Credentials sent to your email.',
@@ -62,7 +67,13 @@ const createOrganizer = async (req, res) => {
 // @access  Private (admin)
 const getAllOrganizers = async (req, res) => {
   try {
+    const cacheKey = 'admin_organizers';
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const organizers = await User.find({ role: 'organizer' }).select('-password').sort({ createdAt: -1 });
+    
+    await cachex.set(cacheKey, organizers, 120);
     res.json(organizers);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -80,6 +91,9 @@ const toggleOrganizerStatus = async (req, res) => {
     }
     organizer.isActive = !organizer.isActive;
     await organizer.save();
+    
+    await cachex.del('admin_organizers');
+    
     res.json({ message: `Organizer ${organizer.isActive ? 'enabled' : 'disabled'}`, isActive: organizer.isActive });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -96,6 +110,10 @@ const deleteOrganizer = async (req, res) => {
       return res.status(404).json({ message: 'Organizer not found' });
     }
     await organizer.deleteOne();
+    
+    await cachex.del('admin_organizers');
+    await cachex.del('admin_stats');
+    
     res.json({ message: 'Organizer deleted permanently' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -107,9 +125,15 @@ const deleteOrganizer = async (req, res) => {
 // @access  Private (admin)
 const getPasswordResetRequests = async (req, res) => {
   try {
+    const cacheKey = 'admin_password_resets';
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const requests = await PasswordResetRequest.find()
       .populate('organizer', 'name email category')
       .sort({ createdAt: -1 });
+      
+    await cachex.set(cacheKey, requests, 120);
     res.json(requests);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -148,12 +172,17 @@ const handlePasswordResetRequest = async (req, res) => {
         console.error('Email error:', e.message);
       }
 
+      await cachex.del('admin_password_resets');
+      await cachex.del('admin_stats');
       res.json({ message: 'Password reset approved. New password sent to admin email.', newPassword });
     } else {
       resetReq.status = 'rejected';
       resetReq.adminComment = adminComment || '';
       resetReq.resolvedAt = new Date();
       await resetReq.save();
+      
+      await cachex.del('admin_password_resets');
+      await cachex.del('admin_stats');
       res.json({ message: 'Password reset request rejected.' });
     }
   } catch (error) {
@@ -166,6 +195,10 @@ const handlePasswordResetRequest = async (req, res) => {
 // @access  Private (admin)
 const getAdminStats = async (req, res) => {
   try {
+    const cacheKey = 'admin_stats';
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const Event = require('../models/Event');
     const Registration = require('../models/Registration');
     
@@ -177,7 +210,9 @@ const getAdminStats = async (req, res) => {
       PasswordResetRequest.countDocuments({ status: 'pending' })
     ]);
 
-    res.json({ totalOrganizers, totalParticipants, totalEvents, totalRegistrations, pendingResets });
+    const stats = { totalOrganizers, totalParticipants, totalEvents, totalRegistrations, pendingResets };
+    await cachex.set(cacheKey, stats, 300); // 5 mins
+    res.json(stats);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

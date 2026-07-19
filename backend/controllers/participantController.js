@@ -3,15 +3,22 @@ const PasswordResetRequest = require('../models/PasswordResetRequest');
 const Registration = require('../models/Registration');
 const Ticket = require('../models/Ticket');
 const Event = require('../models/Event');
+const cachex = require('../utils/cachex');
 
 // @desc    Get participant profile
 // @route   GET /api/participants/profile
 // @access  Private (participant)
 const getProfile = async (req, res) => {
   try {
+    const cacheKey = `participant_profile_${req.user._id}`;
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const user = await User.findById(req.user._id)
       .select('-password')
       .populate('followedClubs', 'name category');
+      
+    await cachex.set(cacheKey, user, 300); // 5 mins
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -34,6 +41,9 @@ const updateProfile = async (req, res) => {
     if (followedClubs !== undefined) user.followedClubs = followedClubs;
 
     await user.save();
+    
+    await cachex.del(`participant_profile_${req.user._id}`);
+    
     res.json({ message: 'Profile updated successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -64,9 +74,15 @@ const changePassword = async (req, res) => {
 // @access  Private (participant)
 const getOrganizers = async (req, res) => {
   try {
+    const cacheKey = 'participant_organizers';
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const organizers = await User.find({ role: 'organizer', isActive: true })
       .select('name email category description clubLogoUrl')
       .sort({ name: 1 });
+      
+    await cachex.set(cacheKey, organizers, 300);
     res.json(organizers);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -84,6 +100,9 @@ const requestPasswordReset = async (req, res) => {
       return res.status(400).json({ message: 'You already have a pending password reset request' });
     }
     const resetReq = await PasswordResetRequest.create({ organizer: req.user._id, reason });
+    
+    await cachex.del('admin_password_resets');
+    
     res.status(201).json({ message: 'Password reset request submitted to Admin', request: resetReq });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -95,6 +114,10 @@ const requestPasswordReset = async (req, res) => {
 // @access  Private (participant)
 const getDashboardData = async (req, res) => {
   try {
+    const cacheKey = `participant_dash_${req.user._id}`;
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const registrations = await Registration.find({ participant: req.user._id }).populate('event');
     const upcomingEvents = registrations.filter(r => r.event && new Date(r.event.eventStartDate) >= new Date()).length;
     const attendedEvents = registrations.filter(r => r.attendanceMarked).length;
@@ -106,14 +129,17 @@ const getDashboardData = async (req, res) => {
       return { ...reg.toObject(), ticket };
     }));
 
-    res.json({
+    const responseData = {
       stats: {
         totalRegistrations: registrations.length,
         upcomingEvents,
         attendedEvents
       },
       recentRegistrations
-    });
+    };
+    
+    await cachex.set(cacheKey, responseData, 120);
+    res.json(responseData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -6,6 +6,7 @@ const User = require('../models/User');
 const { generateQRCode } = require('../utils/qrGenerator');
 const { sendTicketEmail } = require('../utils/emailService');
 const { v4: uuidv4 } = require('uuid');
+const cachex = require('../utils/cachex');
 
 // @desc    Create a team for an event
 // @route   POST /api/teams
@@ -33,6 +34,8 @@ const createTeam = async (req, res) => {
       inviteCode,
       maxSize: maxSize || event.maxTeamSize
     });
+    
+    await cachex.del(`my_teams_${req.user._id}`);
 
     res.status(201).json({ team, inviteCode });
   } catch (error) {
@@ -67,6 +70,10 @@ const joinTeam = async (req, res) => {
     }
     
     await team.save();
+    
+    await cachex.del(`my_teams_${req.user._id}`);
+    await cachex.del(`team_${team._id}`);
+    
     res.json({ message: 'Joined team successfully', team });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -104,6 +111,10 @@ const generateTeamTickets = async (team) => {
     } catch (e) {
       console.error('Email error for team ticket:', e.message);
     }
+    
+    await cachex.del(`my_registrations_${memberId}`);
+    await cachex.del(`event_registrations_${team.event}`);
+    await cachex.del(`participant_dash_${memberId}`);
   }
 };
 
@@ -112,11 +123,17 @@ const generateTeamTickets = async (team) => {
 // @access  Private
 const getTeam = async (req, res) => {
   try {
+    const cacheKey = `team_${req.params.id}`;
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const team = await Team.findById(req.params.id)
       .populate('leader', 'firstName lastName email')
       .populate('members.user', 'firstName lastName email')
       .populate('event', 'eventName eventStartDate');
     if (!team) return res.status(404).json({ message: 'Team not found' });
+    
+    await cachex.set(cacheKey, team, 120);
     res.json(team);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -128,9 +145,16 @@ const getTeam = async (req, res) => {
 // @access  Private
 const getMyTeams = async (req, res) => {
   try {
+    const cacheKey = `my_teams_${req.user._id}`;
+    const cached = await cachex.getJSON(cacheKey);
+    if (cached) return res.json(cached);
+
     const teamsAsLeader = await Team.find({ leader: req.user._id }).populate('event', 'eventName');
     const teamsAsMember = await Team.find({ 'members.user': req.user._id }).populate('event', 'eventName');
-    res.json({ leading: teamsAsLeader, member: teamsAsMember });
+    
+    const responseData = { leading: teamsAsLeader, member: teamsAsMember };
+    await cachex.set(cacheKey, responseData, 120);
+    res.json(responseData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
